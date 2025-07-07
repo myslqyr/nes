@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include "type.h"
+#include <stdbool.h>
 
 typedef struct {
     // enum {
@@ -21,5 +22,5 @@ typedef struct {
 } CPU;
 
 void cpu_init(CPU *cpu);
-
+void set_flag(CPU *cpu, u8 flag, bool value);
 #endif
