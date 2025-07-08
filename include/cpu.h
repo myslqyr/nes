@@ -19,7 +19,7 @@ typedef struct {
     u8 X, Y; // 索引寄存器
     u8 S;    // 堆栈指针
     u16 PC;  // 程序计数器
-    u64 cycle; // 时钟周期
+    u32 cycle; // 时钟周期
 } CPU;
 
 typedef enum {
@@ -106,10 +106,21 @@ typedef struct {
 
 extern OpInfo op_info[256];
 
+typedef void (*OpFunc)(CPU *cpu, AddrMode mode);
+
 void cpu_init(CPU *cpu);
 void set_flag(CPU *cpu, u8 flag);
 u8 get_flag(CPU *cpu);
 void init_op_table();
+
+void clock();   //模拟时钟周期
+void reset();   // 复位信号
+void irq();     //中断信号
+void nmi();     //不可屏蔽中断
+
+u8 fetch(CPU *cpu);     //取指  
+OpInfo get_op(CPU *cpu);
+u16 get_operand_address(CPU *cpu, AddrMode mode); //译码
 
 //寻址方式
 

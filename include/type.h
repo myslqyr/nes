@@ -1,11 +1,9 @@
 #define u8 unsigned char
 #define u16 unsigned short
 #define u32 unsigned int
-#define u64 unsigned long long
 #define s8 signed char
 #define s16 signed short
 #define s32 signed int
-#define s64 signed long long
 
 #define true 1
 #define false 0

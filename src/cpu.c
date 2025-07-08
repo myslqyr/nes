@@ -1,4 +1,8 @@
 #include "../include/cpu.h"
+#include "../include/memory.h"
+
+OpInfo op_info[256];
+
 
 void cpu_init(CPU *cpu) {
     cpu->P = 0;
@@ -104,4 +108,30 @@ void init_op_table() {
     // NOP implied
     op_info[0xEA] = (OpInfo){ OP_NOP, ADDR_IMPL, 2 };
 
+}
+
+u8 fetch(CPU *cpu) {
+    return memory_read(cpu->PC++);
+}
+
+OpInfo get_op(CPU *cpu) {
+    u8 opcode = fetch(cpu);
+    OpInfo of  = op_info[opcode];
+    return of;
+}
+
+u16 get_operand_address(CPU *cpu, AddrMode mode) {
+    switch (mode) {
+        case ADDR_IMM:
+            return cpu->PC++; // 立即数，操作数在下一字节
+        case ADDR_ZP:
+            return memory_read(cpu->PC++) & 0x00FF;//前两位是页号，后两位是页内偏移。
+        case ADDR_ABS: {
+            u8 lo = memory_read(cpu->PC++);
+            u8 hi = memory_read(cpu->PC++);
+            return (hi << 8) | lo;
+        }
+        default:
+            return 0;
+    }
 }
