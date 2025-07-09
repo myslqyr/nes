@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Iinclude -Wall -O2
+CFLAGS = -Iinclude -Wall -g
 SRCS = src/main.c src/cpu.c src/memory.c 
 OBJS = $(SRCS:.c=.o)
 TARGET = nes

@@ -10,7 +10,7 @@ int main() {
     init_op_table();
     memory_init();
 
-    load_rom("./cpu_dummy_reads.nes");
+    load_rom("../nes-test/cpu_dummy_reads/cpu_dummy_reads.nes");
     for(int i = 0;i < sizeof(memory) / sizeof(memory[0]); i++) {
         printf("%x ",memory[i]);
     }
