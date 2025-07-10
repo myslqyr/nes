@@ -124,6 +124,7 @@ OpInfo get_op(CPU *cpu);
 u16 get_operand_address(CPU *cpu, AddrMode mode); //译码
 u8 fetch_op_num(u16 addr);// 取数
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
+void cpu_run(CPU *cpu);
 
 //寻址方式
 

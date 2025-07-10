@@ -125,8 +125,8 @@ u8 fetch(CPU *cpu) {
 /*获取二进制指令的操作码*/
 OpInfo get_op(CPU *cpu) {
     u8 opcode = fetch(cpu);
-    OpInfo of  = op_info[opcode];
-    return of;
+    OpInfo op  = op_info[opcode];
+    return op;
 }
 
 /*根据指令的寻址方式来取指令*/
@@ -238,7 +238,12 @@ u8 fetch_op_num(u16 addr) {
 }
 
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
+    switch(op) {
+        case OP_LDA:
 
+        default:
+            break;
+    }
 }
 
 
