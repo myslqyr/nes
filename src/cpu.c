@@ -118,48 +118,48 @@ u8 fetch(CPU *cpu) {
     return memory_read(cpu->PC++);
 }
 
+
+/*获取二进制指令的操作码*/
 OpInfo get_op(CPU *cpu) {
     u8 opcode = fetch(cpu);
     OpInfo of  = op_info[opcode];
     return of;
 }
 
+/*根据指令的寻址方式来取指令*/
 u16 get_operand_address(CPU *cpu, AddrMode mode) {
     switch (mode) {
-        case ADDR_IMM:
-            return cpu->PC++; // 立即数，操作数在下一字节
-        case ADDR_ZP:
-            return memory_read(cpu->PC++) & 0x00FF;//前两位是页号，后两位是页内偏移。
+        case ADDR_ACC:
+            fetched = cpu->A;
+            return 0;
         case ADDR_ABS: {
             u8 lo = memory_read(cpu->PC++);
             u8 hi = memory_read(cpu->PC++);
             return (hi << 8) | lo;
         }
-
+        case ADDR_ABX: {
+            
+        }
+    
+        case ADDR_IMM:
+            return cpu->PC++; // 立即数，操作数在下一字节
+        case ADDR_ZP:
+            return memory_read(cpu->PC++) & 0x00FF;//前两位是页号，后两位是页内偏移。
+        
         default:
             return 0;
     }
 }
 
+void run_instruction(CPU *cpu, OpType op, u16 addr) {
+
+}
 
 
-/*读取rom到内存中*/
-void load_rom(const char *filename) {
-    FILE *fp = fopen(filename, "rb");
-    if(fp == NULL) {
-        printf("failed to open rom:%s\n",filename);
-        return;
-    }
 
-    //rom头
-    u8 rom_head[16];
-    fread(rom_head, 1, 16, fp);
-    int prg_size = rom_head[4] * 16 * 1024; // PRG-ROM大小
-    fseek(fp, 16, SEEK_SET);
-    fread(&memory[0x8000], 1, prg_size, fp);
-    if(prg_size == 16 * 1024) {
-        memcpy(&memory[0xC000], &memory[0x8000], 16 * 1024);
-    }
-    fclose(fp);
-
+/*模拟CPU的执行过程*/
+void cpu_run(CPU *cpu) {
+    OpInfo op = get_op(cpu);    //取指令
+    u16 addr = get_operand_address(cpu, op.addr_mode);  //译码
+    run_instruction(cpu, op.op, addr);  //执行
 }
