@@ -97,6 +97,7 @@ typedef enum {
     OP_TYA,
     OP_UNK // 未知/非法指令
 } OpType;       //https://www.masswerk.at/6502/6502_instruction_set.html#ORA
+                //https://github.com/tcarmelveilleux/dcc6502#  6502反汇编工具  在线网站：https://www.masswerk.at/6502/disassembler.html
 
 typedef struct {
     OpType op;
@@ -121,6 +122,8 @@ void nmi();     //不可屏蔽中断
 u8 fetch(CPU *cpu);     //取指  
 OpInfo get_op(CPU *cpu);
 u16 get_operand_address(CPU *cpu, AddrMode mode); //译码
+u8 fetch_op_num(u16 addr);// 取数
+void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 
 //寻址方式
 

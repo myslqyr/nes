@@ -6,6 +6,7 @@
 
 OpInfo op_info[256];
 u8 fetched = 0x00;
+u8 page_acrossed = 0x00;
 
 
 void cpu_init(CPU *cpu) {
@@ -14,6 +15,8 @@ void cpu_init(CPU *cpu) {
     cpu->X = 0;
     cpu->Y = 0;
     cpu->S = 0;
+    cpu->PC = 0;
+    cpu->cycle = 0;
     set_flag(cpu, 0);
 }
 
@@ -138,20 +141,103 @@ u16 get_operand_address(CPU *cpu, AddrMode mode) {
             return (hi << 8) | lo;
         }
         case ADDR_ABX: {
-            
+            u8 lo = memory_read(cpu->PC++);
+            u8 hi = memory_read(cpu->PC++);
+            u16 abs = (hi << 8) | lo;
+            u16 final_addr = abs + cpu->X;
+            if((final_addr & 0xFF00) != (abs & 0xFF00)) {
+                page_acrossed = 1;
+            } else {
+                page_acrossed = 0;
+            }
+            return final_addr;
         }
-    
+        case ADDR_ABY: {
+            u8 lo = memory_read(cpu->PC++);
+            u8 hi = memory_read(cpu->PC++);
+            u16 abs = (hi << 8) | lo;
+            u16 final_addr = abs + cpu->Y;
+            if((final_addr & 0xFF00) != (abs & 0xFF00)) {
+                page_acrossed = 1;
+            } else {
+                page_acrossed = 0;
+            }
+            return final_addr;
+        }
         case ADDR_IMM:
-            return cpu->PC++; // 立即数，操作数在下一字节
+            fetched = memory_read(cpu->PC++); // 立即数，操作数在下一字节
+            return 0; 
+        case ADDR_IMPL:
+            return 0;//隐含寻址
+        case ADDR_IND: {
+            u8 lo = memory_read(cpu->PC++);
+            u8 hi = memory_read(cpu->PC++);
+            u16 ptr = (hi << 8) | lo;
+            u8 nlo = memory_read(ptr);
+            u8 nhi;
+            if ((ptr & 0x00FF) == 0x00FF) {
+                // 间接寻址模拟6502 bug: 高字节从本页开头取，https://www.nesdev.org/obelisk-6502-guide/reference.html#JMP
+                nhi = memory_read(ptr & 0xFF00);
+            } else {
+                nhi = memory_read(ptr + 1);
+            }
+            return (nhi << 8) | nlo;
+        }
+        case ADDR_INDX: {
+            u8 zp_addr = memory_read(cpu->PC++);
+            u8 ptr = (zp_addr + cpu->X) & 0xFF; // 零页循环
+            u8 lo = memory_read(ptr);
+            u8 hi = memory_read((ptr + 1) & 0xFF); 
+            return (hi << 8) | lo;
+        }
+        case ADDR_INDY: {
+            u8 zp_addr = memory_read(cpu->PC++);
+            u8 lo = memory_read(zp_addr);
+            u8 hi = memory_read((zp_addr + 1) & 0xFF); 
+            u16 base = (hi << 8) | lo;
+            u16 final_addr = base + cpu->Y;
+            if ((final_addr & 0xFF00) != (base & 0xFF00)) {
+                page_acrossed = 1;
+            } else {
+                page_acrossed = 0;
+            }
+            return final_addr;
+        }        
         case ADDR_ZP:
-            return memory_read(cpu->PC++) & 0x00FF;//前两位是页号，后两位是页内偏移。
-        
+            return memory_read(cpu->PC++); // 零页寻址，返回8位地址
+        case ADDR_ZPX: {
+            u8 base = memory_read(cpu->PC++);
+            return (base + cpu->X) & 0xFF; 
+        }
+        case ADDR_ZPY: {
+            u8 base = memory_read(cpu->PC++);
+            return (base + cpu->Y) & 0xFF; 
+        }
+        case ADDR_REL: {
+            u8 offset = memory_read(cpu->PC++);
+            // 6502的REL是带符号的8位偏移
+            if (offset & 0x80) {
+                // 负数，补码扩展
+                return cpu->PC + (offset | 0xFF00);
+            } else {
+                // 正数
+                return cpu->PC + offset;
+            }
+        }
         default:
             return 0;
     }
 }
 
-void run_instruction(CPU *cpu, OpType op, u16 addr) {
+u8 fetch_op_num(u16 addr) {
+    if(addr == (u16)0) {
+        return fetched;
+    }else {
+        return memory_read(addr);
+    }
+}
+
+void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
 
 }
 
@@ -161,5 +247,6 @@ void run_instruction(CPU *cpu, OpType op, u16 addr) {
 void cpu_run(CPU *cpu) {
     OpInfo op = get_op(cpu);    //取指令
     u16 addr = get_operand_address(cpu, op.addr_mode);  //译码
-    run_instruction(cpu, op.op, addr);  //执行
+    u8 num = fetch_op_num(addr);
+    run_instruction(cpu, op.op, addr, num);  //执行
 }
