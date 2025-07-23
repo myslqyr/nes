@@ -189,6 +189,10 @@ void init_op_table() {
     /*V*=1*/
     op_info[0x70] = (OpInfo){ OP_BVS, ADDR_REL, 2 };
 
+//强制转移
+    /*强制暂停*/
+    op_info[0x00] = (OpInfo){ OP_BRK, ADDR_IMPL, 7 };
+
 }
 
 u8 fetch(CPU *cpu) {
