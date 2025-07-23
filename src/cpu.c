@@ -165,6 +165,30 @@ void init_op_table() {
     op_info[0x7E] = (OpInfo){ OP_ROR, ADDR_ABX, 7 };
 
 //条件分支
+    /*C*=0*/
+    op_info[0x90] = (OpInfo){ OP_BCC, ADDR_REL, 2 };
+
+    /*C*=1*/
+    op_info[0xB0] = (OpInfo){ OP_BCS, ADDR_REL, 2 };
+
+    /*Z*=0*/
+    op_info[0xD0] = (OpInfo){ OP_BNE, ADDR_REL, 2 };
+
+    /*Z=1*/
+    op_info[0xF0] = (OpInfo){ OP_BEQ, ADDR_REL, 2 };
+
+    /*N*=0*/
+    op_info[0x10] = (OpInfo){ OP_BPL, ADDR_REL, 2 };
+
+    /*N*=1*/
+    op_info[0x30] = (OpInfo){ OP_BMI, ADDR_REL, 2 };
+
+    /*V*=0*/
+    op_info[0x50] = (OpInfo){ OP_BVC, ADDR_REL, 2 };
+
+    /*V*=1*/
+    op_info[0x70] = (OpInfo){ OP_BVS, ADDR_REL, 2 };
+
 }
 
 u8 fetch(CPU *cpu) {
@@ -263,16 +287,25 @@ u16 get_operand_address(CPU *cpu, AddrMode mode) {
             u8 base = memory_read(cpu->PC++);
             return (base + cpu->Y) & 0xFF; 
         }
+        /*相对寻址主要实现分支和跳转指令*/
         case ADDR_REL: {
             u8 offset = memory_read(cpu->PC++);
+            u16 base_pc = cpu->PC;
             // 6502的REL是带符号的8位偏移
             if (offset & 0x80) {
                 // 负数，补码扩展
-                return cpu->PC + (offset | 0xFF00);
+                base_pc = cpu->PC + (offset | 0xFF00);
             } else {
                 // 正数
-                return cpu->PC + offset;
+                base_pc = cpu->PC + offset;
             }
+            // 检查是否跨页
+            if ((base_pc & 0xFF00) != (cpu->PC & 0xFF00)) {
+                page_acrossed = 2;  // 跨页加2个周期
+            } else {
+                page_acrossed = 1;  // 同页加1个周期
+            }
+            return base_pc;
         }
         default:
             return 0;
