@@ -77,7 +77,6 @@ void init_op_table() {
     /*Y+1*/
     op_info[0xC8] = (OpInfo){ OP_INY, ADDR_IMPL, 2 };
 
-
 //减法操作
     /*带借位减法*/
     op_info[0xE1] = (OpInfo){ OP_SBC, ADDR_INDX, 6 };
@@ -89,12 +88,83 @@ void init_op_table() {
     op_info[0xFD] = (OpInfo){ OP_SBC, ADDR_ABX, 4 };   
     op_info[0xF9] = (OpInfo){ OP_SBC, ADDR_ABY, 4 };   
 
-
-
     /*存储器-1*/
     op_info[0xC6] = (OpInfo){ OP_DEC, ADDR_ZP, 5 };
     op_info[0xD6] = (OpInfo){ OP_DEC, ADDR_ZPX, 6 };
     op_info[0xCE] = (OpInfo){ OP_DEC, ADDR_ABS, 6 };
+    op_info[0xDE] = (OpInfo){ OP_DEC, ADDR_ABX, 7 };
+
+    /*X-1*/
+    op_info[0xCA] = (OpInfo){ OP_DEX, ADDR_IMPL, 2 };
+
+    /*Y-1*/
+    op_info[0x88] = (OpInfo){ OP_DEY, ADDR_IMPL, 2 };
+
+//逻辑运算
+    /*逻辑与*/
+    op_info[0x29] = (OpInfo){ OP_AND, ADDR_IMM, 2 };
+    op_info[0x25] = (OpInfo){ OP_AND, ADDR_ZP, 3 };
+    op_info[0x2D] = (OpInfo){ OP_AND, ADDR_ABS, 4 };
+    op_info[0x35] = (OpInfo){ OP_AND, ADDR_ZPX, 4 };
+    op_info[0x3D] = (OpInfo){ OP_AND, ADDR_ABX, 4 };
+    op_info[0x39] = (OpInfo){ OP_AND, ADDR_ABY, 4 };
+    op_info[0x21] = (OpInfo){ OP_AND, ADDR_INDX, 6 };
+    op_info[0x31] = (OpInfo){ OP_AND, ADDR_INDY, 5 };
+
+    /*逻辑或*/
+    op_info[0x09] = (OpInfo){ OP_ORA, ADDR_IMM, 2 };
+    op_info[0x05] = (OpInfo){ OP_ORA, ADDR_ZP, 3 };
+    op_info[0x0D] = (OpInfo){ OP_ORA, ADDR_ABS, 4 };
+    op_info[0x15] = (OpInfo){ OP_ORA, ADDR_ZPX, 4 };
+    op_info[0x1D] = (OpInfo){ OP_ORA, ADDR_ABX, 4 };
+    op_info[0x19] = (OpInfo){ OP_ORA, ADDR_ABY, 4 };
+    op_info[0x01] = (OpInfo){ OP_ORA, ADDR_INDX, 6 };
+    op_info[0x11] = (OpInfo){ OP_ORA, ADDR_INDY, 5 };
+
+    /*逻辑异或*/
+    op_info[0x49] = (OpInfo){ OP_EOR, ADDR_IMM, 2 };
+    op_info[0x45] = (OpInfo){ OP_EOR, ADDR_ZP, 3 };
+    op_info[0x4D] = (OpInfo){ OP_EOR, ADDR_ABS, 4 };
+    op_info[0x55] = (OpInfo){ OP_EOR, ADDR_ZPX, 4 };
+    op_info[0x5D] = (OpInfo){ OP_EOR, ADDR_ABX, 4 };
+    op_info[0x59] = (OpInfo){ OP_EOR, ADDR_ABY, 4 };
+    op_info[0x41] = (OpInfo){ OP_EOR, ADDR_INDX, 6 };
+    op_info[0x51] = (OpInfo){ OP_EOR, ADDR_INDY, 5 };
+
+    /*位测试*/
+    op_info[0x24] = (OpInfo){ OP_BIT, ADDR_ZP, 3 };
+    op_info[0x2C] = (OpInfo){ OP_BIT, ADDR_ABS, 4 };
+
+//移位
+    /*左移*/
+    op_info[0x0A] = (OpInfo){ OP_ASL, ADDR_ACC, 2 };
+    op_info[0x06] = (OpInfo){ OP_ASL, ADDR_ZP, 5 };
+    op_info[0x0E] = (OpInfo){ OP_ASL, ADDR_ABS, 6 };
+    op_info[0x16] = (OpInfo){ OP_ASL, ADDR_ZPX, 6 };
+    op_info[0x1E] = (OpInfo){ OP_ASL, ADDR_ABX, 7 };
+
+    /*右移*/
+    op_info[0x4A] = (OpInfo){ OP_LSR, ADDR_ACC, 2 };
+    op_info[0x46] = (OpInfo){ OP_LSR, ADDR_ZP, 5 };
+    op_info[0x4E] = (OpInfo){ OP_LSR, ADDR_ABS, 6 };
+    op_info[0x56] = (OpInfo){ OP_LSR, ADDR_ZPX, 6 };
+    op_info[0x5E] = (OpInfo){ OP_LSR, ADDR_ABX, 7 };
+
+    /*循环左移*/
+    op_info[0x2A] = (OpInfo){ OP_ROL, ADDR_ACC, 2 };
+    op_info[0x26] = (OpInfo){ OP_ROL, ADDR_ZP, 5 };
+    op_info[0x2E] = (OpInfo){ OP_ROL, ADDR_ABS, 6 };
+    op_info[0x36] = (OpInfo){ OP_ROL, ADDR_ZPX, 6 };
+    op_info[0x3E] = (OpInfo){ OP_ROL, ADDR_ABX, 7 };
+
+    /*循环右移*/
+    op_info[0x6A] = (OpInfo){ OP_ROR, ADDR_ACC, 2 };
+    op_info[0x66] = (OpInfo){ OP_ROR, ADDR_ZP, 5 };
+    op_info[0x6E] = (OpInfo){ OP_ROR, ADDR_ABS, 6 };
+    op_info[0x76] = (OpInfo){ OP_ROR, ADDR_ZPX, 6 };
+    op_info[0x7E] = (OpInfo){ OP_ROR, ADDR_ABX, 7 };
+
+//条件分支
 }
 
 u8 fetch(CPU *cpu) {
