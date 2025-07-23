@@ -10,22 +10,22 @@ u8 fetched = 0x00;
 u8 page_acrossed = 0x00;
 
 // 堆栈操作辅助函数,堆栈固定在第一个页中
-static void push_stack(CPU *cpu, u8 value) {
+void push_stack(CPU *cpu, u8 value) {
     memory_write(0x100 + cpu->S, value);
     cpu->S--;
 }
 
-static void push_stack16(CPU *cpu, u16 value) {
+void push_stack16(CPU *cpu, u16 value) {
     push_stack(cpu, (value >> 8) & 0xFF);  // 高字节
     push_stack(cpu, value & 0xFF);         // 低字节
 }
 
-static u8 pull_stack(CPU *cpu) {
+u8 pull_stack(CPU *cpu) {
     cpu->S++;
     return memory_read(0x100 + cpu->S);
 }
 
-static u16 pull_stack16(CPU *cpu) {
+u16 pull_stack16(CPU *cpu) {
     u8 lo = pull_stack(cpu);
     u8 hi = pull_stack(cpu);
     return (hi << 8) | lo;

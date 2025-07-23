@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "../include/cpu.h"
 #include "../include/memory.h"
 
