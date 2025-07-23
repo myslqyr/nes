@@ -3,21 +3,32 @@
 
 #include "../include/cpu.h"
 #include "../include/memory.h"
+#include "../include/irq.h"
 
 OpInfo op_info[256];
 u8 fetched = 0x00;
 u8 page_acrossed = 0x00;
 
+// 堆栈操作辅助函数,堆栈固定在第一个页中
+static void push_stack(CPU *cpu, u8 value) {
+    memory_write(0x100 + cpu->S, value);
+    cpu->S--;
+}
 
-void cpu_init(CPU *cpu) {
-    cpu->P = 0;
-    cpu->A = 0;
-    cpu->X = 0;
-    cpu->Y = 0;
-    cpu->S = 0;
-    cpu->PC = 0;
-    cpu->cycle = 0;
-    set_flag(cpu, 0);
+static void push_stack16(CPU *cpu, u16 value) {
+    push_stack(cpu, (value >> 8) & 0xFF);  // 高字节
+    push_stack(cpu, value & 0xFF);         // 低字节
+}
+
+static u8 pull_stack(CPU *cpu) {
+    cpu->S++;
+    return memory_read(0x100 + cpu->S);
+}
+
+static u16 pull_stack16(CPU *cpu) {
+    u8 lo = pull_stack(cpu);
+    u8 hi = pull_stack(cpu);
+    return (hi << 8) | lo;
 }
 
 /*
@@ -43,78 +54,47 @@ u8 get_flag(CPU *cpu) {
     模拟6502芯片的指令集
 */
 void init_op_table() {
-    // BRK implied
-    op_info[0x00] = (OpInfo){ OP_BRK, ADDR_IMPL, 7 };
+/*加法运算*/
+    /*带进位加法*/
+    op_info[0x69] = (OpInfo){ OP_ADC, ADDR_IMM, 2 };
+    op_info[0x65] = (OpInfo){ OP_ADC, ADDR_ZP, 3 };
+    op_info[0x6D] = (OpInfo){ OP_ADC, ADDR_ABS, 4 };
+    op_info[0x75] = (OpInfo){ OP_ADC, ADDR_ZPX, 4 };
+    op_info[0x7D] = (OpInfo){ OP_ADC, ADDR_ABX, 4 };
+    op_info[0x79] = (OpInfo){ OP_ADC, ADDR_ABY, 4 };
+    op_info[0x61] = (OpInfo){ OP_ADC, ADDR_INDX, 6 };
+    op_info[0x71] = (OpInfo){ OP_ADC, ADDR_INDY, 5 };
 
-    // ORA (X,ind)
-    op_info[0x01] = (OpInfo){ OP_ORA, ADDR_INDX, 6 };
+    /*存储器+1*/
+    op_info[0xE6] = (OpInfo){ OP_INC, ADDR_ZP, 5 };
+    op_info[0xF6] = (OpInfo){ OP_INC, ADDR_ZPX, 6 };
+    op_info[0xEE] = (OpInfo){ OP_INC, ADDR_ABS, 6 };
+    op_info[0xFE] = (OpInfo){ OP_INC, ADDR_ABX, 7 };
 
-    // ORA zpg
-    op_info[0x05] = (OpInfo){ OP_ORA, ADDR_ZP, 3 };
+    /*X+1*/
+    op_info[0xE8] = (OpInfo){ OP_INX, ADDR_IMPL, 2 };
 
-    // ASL zpg
-    op_info[0x06] = (OpInfo){ OP_ASL, ADDR_ZP, 5 };
+    /*Y+1*/
+    op_info[0xC8] = (OpInfo){ OP_INY, ADDR_IMPL, 2 };
 
-    // PHP implied
-    op_info[0x08] = (OpInfo){ OP_PHP, ADDR_IMPL, 3 };
 
-    // ORA #imm
-    op_info[0x09] = (OpInfo){ OP_ORA, ADDR_IMM, 2 };
+//减法操作
+    /*带借位减法*/
+    op_info[0xE1] = (OpInfo){ OP_SBC, ADDR_INDX, 6 };
+    op_info[0xF1] = (OpInfo){ OP_SBC, ADDR_INDY, 5 };
+    op_info[0xE9] = (OpInfo){ OP_SBC, ADDR_IMM, 2 };   
+    op_info[0xE5] = (OpInfo){ OP_SBC, ADDR_ZP, 3 };    
+    op_info[0xF5] = (OpInfo){ OP_SBC, ADDR_ZPX, 4 };   
+    op_info[0xED] = (OpInfo){ OP_SBC, ADDR_ABS, 4 }; 
+    op_info[0xFD] = (OpInfo){ OP_SBC, ADDR_ABX, 4 };   
+    op_info[0xF9] = (OpInfo){ OP_SBC, ADDR_ABY, 4 };   
 
-    // ASL A
-    op_info[0x0A] = (OpInfo){ OP_ASL, ADDR_ACC, 2 };
 
-    // ORA abs
-    op_info[0x0D] = (OpInfo){ OP_ORA, ADDR_ABS, 4 };
 
-    // ASL abs
-    op_info[0x0E] = (OpInfo){ OP_ASL, ADDR_ABS, 6 };
-
-    // BPL rel
-    op_info[0x10] = (OpInfo){ OP_BPL, ADDR_REL, 2 }; // +1 if branch occurs, +2 if to new page
-
-    // CLC implied
-    op_info[0x18] = (OpInfo){ OP_CLC, ADDR_IMPL, 2 };
-
-    // JSR abs
-    op_info[0x20] = (OpInfo){ OP_JSR, ADDR_ABS, 6 };
-
-    // AND (X,ind)
-    op_info[0x21] = (OpInfo){ OP_AND, ADDR_INDX, 6 };
-
-    // BIT zpg
-    op_info[0x24] = (OpInfo){ OP_BIT, ADDR_ZP, 3 };
-
-    // AND #imm
-    op_info[0x29] = (OpInfo){ OP_AND, ADDR_IMM, 2 };
-
-    // ROL A
-    op_info[0x2A] = (OpInfo){ OP_ROL, ADDR_ACC, 2 };
-
-    // PLP implied
-    op_info[0x28] = (OpInfo){ OP_PLP, ADDR_IMPL, 4 };
-
-    // BMI rel
-    op_info[0x30] = (OpInfo){ OP_BMI, ADDR_REL, 2 }; // +1 if branch occurs, +2 if to new page
-
-    // RTI implied
-    op_info[0x40] = (OpInfo){ OP_RTI, ADDR_IMPL, 6 };
-
-    // EOR (X,ind)
-    op_info[0x41] = (OpInfo){ OP_EOR, ADDR_INDX, 6 };
-
-    // JMP abs
-    op_info[0x4C] = (OpInfo){ OP_JMP, ADDR_ABS, 3 };
-
-    // LDA #imm
-    op_info[0xA9] = (OpInfo){ OP_LDA, ADDR_IMM, 2 };
-
-    // STA abs
-    op_info[0x8D] = (OpInfo){ OP_STA, ADDR_ABS, 4 };
-
-    // NOP implied
-    op_info[0xEA] = (OpInfo){ OP_NOP, ADDR_IMPL, 2 };
-
+    /*存储器-1*/
+    op_info[0xC6] = (OpInfo){ OP_DEC, ADDR_ZP, 5 };
+    op_info[0xD6] = (OpInfo){ OP_DEC, ADDR_ZPX, 6 };
+    op_info[0xCE] = (OpInfo){ OP_DEC, ADDR_ABS, 6 };
 }
 
 u8 fetch(CPU *cpu) {
@@ -240,6 +220,8 @@ u8 fetch_op_num(u16 addr) {
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
     switch(op) {
         case OP_LDA:
+            cpu->A = num;
+            break;
 
         default:
             break;
@@ -247,11 +229,30 @@ void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
 }
 
 
-
 /*模拟CPU的执行过程*/
 void cpu_run(CPU *cpu) {
+    // 检查中断
+    check_interrupts(cpu);
+    
+    // 正常的指令执行
     OpInfo op = get_op(cpu);    //取指令
     u16 addr = get_operand_address(cpu, op.addr_mode);  //译码
     u8 num = fetch_op_num(addr);
     run_instruction(cpu, op.op, addr, num);  //执行
+    cpu->cycle = cpu->cycle + op.cycles + page_acrossed;    //同步时钟周期
+    page_acrossed = 0;
+}
+
+/*初始化cpu*/
+void cpu_init(CPU *cpu) {
+    cpu->P = FLAG_U;  // 未使用位总是1
+    cpu->A = 0;
+    cpu->X = 0;
+    cpu->Y = 0;
+    cpu->S = 0xFD;    // 初始化堆栈指针
+    cpu->PC = 0;
+    cpu->cycle = 0;
+    cpu->nmi_pending = false;
+    cpu->irq_pending = false;
+    reset(cpu);
 }

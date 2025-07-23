@@ -4,22 +4,32 @@
 #include "type.h"
 #include <stdbool.h>
 
+// 中断向量地址
+#define NMI_VECTOR    0xFFFA  // NMI中断向量地址
+#define RESET_VECTOR  0xFFFC  // RESET中断向量地址
+#define IRQ_VECTOR    0xFFFE  // IRQ中断向量地址
+
+// CPU状态寄存器标志位
+#define FLAG_C  (1 << 0)  // 进位标志
+#define FLAG_Z  (1 << 1)  // 零标志
+#define FLAG_I  (1 << 2)  // 中断禁止标志
+#define FLAG_D  (1 << 3)  // 十进制模式标志
+#define FLAG_B  (1 << 4)  // Break指令标志
+#define FLAG_U  (1 << 5)  // 未使用（总是1）
+#define FLAG_V  (1 << 6)  // 溢出标志
+#define FLAG_N  (1 << 7)  // 负数标志
+
 typedef struct {
-    // enum {
-    //     C = (1 << 0),       // 进位标志
-    //     Z = (1 << 1),       // 零标志
-    //     I = (1 << 2),       // 中断禁止标志
-    //     D = (1 << 3),       // 十进制模式标志
-    //     B = (1 << 4),       // bank指令标志
-    //     V = (1 << 6),       // 溢出标志
-    //     N = (1 << 7),       // 负数标志
-    // } P;    //https://www.cnblogs.com/Abraverman/articles/15659200.html
     u8 P;    // 程序状态字
     u8 A;    // 累加器
     u8 X, Y; // 索引寄存器
     u8 S;    // 堆栈指针
     u16 PC;  // 程序计数器
     u32 cycle; // 时钟周期
+    
+    // 中断相关标志
+    bool nmi_pending;   // NMI中断等待处理
+    bool irq_pending;   // IRQ中断等待处理
 } CPU;
 
 typedef enum {
