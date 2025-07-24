@@ -186,7 +186,7 @@ void init_op_table() {
     /*V*=0*/
     op_info[0x50] = (OpInfo){ OP_BVC, ADDR_REL, 2 };
 
-    /*V*=1*/
+    /*V*=1*/ 
     op_info[0x70] = (OpInfo){ OP_BVS, ADDR_REL, 2 };
 
 //强制转移
