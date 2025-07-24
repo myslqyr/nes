@@ -193,6 +193,61 @@ void init_op_table() {
     /*强制暂停*/
     op_info[0x00] = (OpInfo){ OP_BRK, ADDR_IMPL, 7 };
 
+    /*转移*/
+    op_info[0x4C] = (OpInfo){ OP_JMP, ADDR_ABS, 3 };
+    op_info[0x6C] = (OpInfo){ OP_JMP, ADDR_IND, 5 };
+
+    /*转子*/
+    op_info[0x20] = (OpInfo){ OP_JSR, ADDR_ABS, 6 };
+
+    /*中断返回*/
+    op_info[0x40] = (OpInfo){ OP_RTI, ADDR_IMPL, 6 };
+
+    /*子程序返回*/
+    op_info[0x60] = (OpInfo){ OP_RTS, ADDR_IMPL, 6 };
+
+//设置状态处理器
+    /*清除进位标志*/
+    op_info[0x18] = (OpInfo){ OP_CLC, ADDR_IMPL, 2 };
+
+    /*清十进制标志*/
+    op_info[0xD8] = (OpInfo){ OP_CLD, ADDR_IMPL, 2 };
+
+    /*清除溢出标志*/
+    op_info[0xB8] = (OpInfo){ OP_CLV, ADDR_IMPL, 2 };
+
+    /*清除中断标志*/
+    op_info[0x58] = (OpInfo){ OP_CLI, ADDR_IMPL, 2 };
+
+    /*设置进位标志*/
+    op_info[0x38] = (OpInfo){ OP_SEC, ADDR_IMPL, 2 };
+
+    /*设置十进制标志*/
+    op_info[0xF8] = (OpInfo){ OP_SED, ADDR_IMPL, 2 };
+
+    /*设置溢出标志*/
+    op_info[0x78] = (OpInfo){ OP_SEI, ADDR_IMPL, 2 };
+
+//比较，M为存储器
+    /*A-M比较*/
+    op_info[0xC9] = (OpInfo){ OP_CMP, ADDR_IMM, 2 };
+    op_info[0xC5] = (OpInfo){ OP_CMP, ADDR_ZP, 3 };
+    op_info[0xCD] = (OpInfo){ OP_CMP, ADDR_ABS, 4 };
+    op_info[0xD5] = (OpInfo){ OP_CMP, ADDR_ZPX, 4 };
+    op_info[0xDD] = (OpInfo){ OP_CMP, ADDR_ABX, 4 };
+    op_info[0xD9] = (OpInfo){ OP_CMP, ADDR_ABY, 4 };
+    op_info[0xC1] = (OpInfo){ OP_CMP, ADDR_INDX, 6 };
+    op_info[0xD1] = (OpInfo){ OP_CMP, ADDR_INDY, 5 };
+
+    /*X-M比较*/
+    op_info[0xE0] = (OpInfo){ OP_CPX, ADDR_IMM, 2 };
+    op_info[0xE4] = (OpInfo){ OP_CPX, ADDR_ZP, 3 };
+    op_info[0xEC] = (OpInfo){ OP_CPX, ADDR_ABS, 4 };
+
+    /*Y-M比较*/
+    op_info[0xC0] = (OpInfo){ OP_CPY, ADDR_IMM, 2 };
+    op_info[0xC4] = (OpInfo){ OP_CPY, ADDR_ZP, 3 };
+    op_info[0xCC] = (OpInfo){ OP_CPY, ADDR_ABS, 4 };
 }
 
 u8 fetch(CPU *cpu) {
