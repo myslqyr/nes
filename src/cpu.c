@@ -464,6 +464,33 @@ u8 fetch_op_num(u16 addr) {
 
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
     switch(op) {
+        //TODO:运算指令 需要考虑各个标志位
+        case OP_ADC: {
+            u16 result = cpu->A + num + cpu->P & FLAG_C;
+            cpu->A = result & 0xFF;
+            cpu->P = (cpu->P & ~FLAG_C) | ((result >> 8) & FLAG_C);
+
+            if(result == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+        case OP_INC: {
+            u8 result = num + 1;
+            memory_write(addr, result);
+            if(result == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+
+//
+
+
         case OP_LDA:
             cpu->A = num;
             break;
