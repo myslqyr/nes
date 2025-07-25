@@ -462,11 +462,17 @@ u8 fetch_op_num(u16 addr) {
     }
 }
 
+//TODO:集中处理各个标志位
+void set_cpu_p(CPU *cpu, u8 num) {
+    return ;
+}
+
+
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
     switch(op) {
         //TODO:运算指令 需要考虑各个标志位
         case OP_ADC: {
-            u16 result = cpu->A + num + cpu->P & FLAG_C;
+            u16 result = (cpu->A + num + (cpu->P & FLAG_C));
             cpu->A = result & 0xFF;
             cpu->P = (cpu->P & ~FLAG_C) | ((result >> 8) & FLAG_C);
 
@@ -488,7 +494,16 @@ void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
             break;
         }
 
-//
+//逻辑运算
+        case OP_AND: {
+            cpu->A = cpu->A & num;
+            if(cpu->A == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
 
 
         case OP_LDA:
