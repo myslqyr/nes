@@ -54,6 +54,11 @@ u8 get_flag(CPU *cpu) {
     模拟6502芯片的指令集
 */
 void init_op_table() {
+
+    for(int i = 0; i < 256; i++) {
+        op_info[i] = (OpInfo){ OP_NOP, ADDR_IMPL, 2 };
+    }
+
 /*加法运算*/
     /*带进位加法*/
     op_info[0x69] = (OpInfo){ OP_ADC, ADDR_IMM, 2 };
@@ -248,6 +253,84 @@ void init_op_table() {
     op_info[0xC0] = (OpInfo){ OP_CPY, ADDR_IMM, 2 };
     op_info[0xC4] = (OpInfo){ OP_CPY, ADDR_ZP, 3 };
     op_info[0xCC] = (OpInfo){ OP_CPY, ADDR_ABS, 4 };
+
+//寄存器相关
+    /*M->A*/
+    op_info[0xA9] = (OpInfo){ OP_LDA, ADDR_IMM, 2 };
+    op_info[0xA5] = (OpInfo){ OP_LDA, ADDR_ZP, 3 };
+    op_info[0xAD] = (OpInfo){ OP_LDA, ADDR_ABS, 4 };
+    op_info[0xB5] = (OpInfo){ OP_LDA, ADDR_ZPX, 4 };
+    op_info[0xBD] = (OpInfo){ OP_LDA, ADDR_ABX, 4 };
+    op_info[0xB9] = (OpInfo){ OP_LDA, ADDR_ABY, 4 };
+    op_info[0xA1] = (OpInfo){ OP_LDA, ADDR_INDX, 6 };
+    op_info[0xB1] = (OpInfo){ OP_LDA, ADDR_INDY, 5 };
+
+    /*M->X*/
+    op_info[0xA2] = (OpInfo){ OP_LDX, ADDR_IMM, 2 };
+    op_info[0xA6] = (OpInfo){ OP_LDX, ADDR_ZP, 3 };
+    op_info[0xAE] = (OpInfo){ OP_LDX, ADDR_ABS, 4 };
+    op_info[0xB6] = (OpInfo){ OP_LDX, ADDR_ZPX, 4 };
+    op_info[0xBE] = (OpInfo){ OP_LDX, ADDR_ABY, 4 };
+
+    /*M->Y*/
+    op_info[0xA0] = (OpInfo){ OP_LDY, ADDR_IMM, 2 };
+    op_info[0xA4] = (OpInfo){ OP_LDY, ADDR_ZP, 3 };
+    op_info[0xAC] = (OpInfo){ OP_LDY, ADDR_ABS, 4 };
+    op_info[0xB4] = (OpInfo){ OP_LDY, ADDR_ZPX, 4 };
+    op_info[0xBC] = (OpInfo){ OP_LDY, ADDR_ABX, 4 };
+
+    /*A->M*/
+    op_info[0x85] = (OpInfo){ OP_STA, ADDR_ZP, 3 };
+    op_info[0x8D] = (OpInfo){ OP_STA, ADDR_ABS, 4 };
+    op_info[0x95] = (OpInfo){ OP_STA, ADDR_ZPX, 4 };
+    op_info[0x9D] = (OpInfo){ OP_STA, ADDR_ABX, 5 };
+    op_info[0x99] = (OpInfo){ OP_STA, ADDR_ABY, 5 };
+    op_info[0x81] = (OpInfo){ OP_STA, ADDR_INDX, 6 };
+    op_info[0x91] = (OpInfo){ OP_STA, ADDR_INDY, 6 };
+
+    /*X->M*/
+    op_info[0x86] = (OpInfo){ OP_STX, ADDR_ZP, 3 };
+    op_info[0x8E] = (OpInfo){ OP_STX, ADDR_ABS, 4 };
+    op_info[0x96] = (OpInfo){ OP_STX, ADDR_ZPY, 4 };
+
+    /*Y->M*/
+    op_info[0x84] = (OpInfo){ OP_STY, ADDR_ZP, 3 };
+    op_info[0x8C] = (OpInfo){ OP_STY, ADDR_ABS, 4 };
+    op_info[0x94] = (OpInfo){ OP_STY, ADDR_ZPX, 4 };
+
+    /*A->X*/
+    op_info[0xAA] = (OpInfo){ OP_TAX, ADDR_IMPL, 2 };
+
+    /*A->Y*/
+    op_info[0xA8] = (OpInfo){ OP_TAY, ADDR_IMPL, 2 };
+
+    /*S->X*/
+    op_info[0xBA] = (OpInfo){ OP_TSX, ADDR_IMPL, 2 };
+
+    /*X->S*/
+    op_info[0x9A] = (OpInfo){ OP_TXS, ADDR_IMPL, 2 };
+
+    /*X->A*/
+    op_info[0x8A] = (OpInfo){ OP_TXA, ADDR_IMPL, 2 };
+
+    /*Y->A*/
+    op_info[0x98] = (OpInfo){ OP_TYA, ADDR_IMPL, 2 };
+
+//堆栈操作
+    /*A->S*/
+    op_info[0x48] = (OpInfo){ OP_PHA, ADDR_IMPL, 3 };
+
+    /*S->A*/
+    op_info[0x68] = (OpInfo){ OP_PLA, ADDR_IMPL, 4 };
+
+    /*P->S*/
+    op_info[0x08] = (OpInfo){ OP_PHP, ADDR_IMPL, 3 };
+
+    /*S->P*/
+    op_info[0x28] = (OpInfo){ OP_PLP, ADDR_IMPL, 4 };
+
+//空操作
+    op_info[0xEA] = (OpInfo){ OP_NOP, ADDR_IMPL, 2 };
 }
 
 u8 fetch(CPU *cpu) {
