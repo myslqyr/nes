@@ -24,6 +24,6 @@ void memory_init();
 void memory_write(u16 addr, u8 data);
 u8 memory_read(u16 addr);
 
-void load_rom(const char *filename);
+u8 load_rom(const char *filename);
 
 #endif

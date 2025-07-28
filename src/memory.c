@@ -32,11 +32,11 @@ u8 memory_read(u16 addr) {
 }
 
 /*读取rom到内存中*/
-void load_rom(const char *filename) {
+u8 load_rom(const char *filename) {
     FILE *fp = fopen(filename, "rb");
     if(fp == NULL) {
         printf("failed to open rom:%s\n",filename);
-        return;
+        return -1;
     }
 
     //rom头
@@ -49,5 +49,5 @@ void load_rom(const char *filename) {
         memcpy(&memory[0xC000], &memory[0x8000], 16 * 1024);
     }
     fclose(fp);
-
+    return 0;
 }

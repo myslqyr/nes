@@ -16,7 +16,14 @@ int main() {
     init_op_table();
     memory_init();
 
-    // TODO: 确保ROM文件存在
+    char *rom_path = malloc(100);
+    printf("请输入ROM文件路径: ");
+    scanf("%s", rom_path);
+    u8 ret = load_rom(rom_path);
+    if(ret != 0) {
+        printf("failed to load rom\n");
+        return 1;
+    }
     // load_rom("../nes-test/cpu_dummy_reads/cpu_dummy_reads.nes");
 
     while(1) {

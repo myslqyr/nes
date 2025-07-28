@@ -475,7 +475,6 @@ void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
             u16 result = (cpu->A + num + (cpu->P & FLAG_C));
             cpu->A = result & 0xFF;
             cpu->P = (cpu->P & ~FLAG_C) | ((result >> 8) & FLAG_C);
-
             if(result == 0) {
                 cpu->P |= FLAG_Z;
             } else {
@@ -504,6 +503,77 @@ void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num) {
             }
             break;
         }
+
+        case OP_EOR: {
+            cpu->A = cpu->A ^ num;
+            if(cpu->A == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+
+        case OP_ORA: {
+            cpu->A = cpu->A | num;
+            if(cpu->A == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+
+        case OP_BIT: {
+            u8 result = cpu->A & num;
+            cpu->P = (cpu->P & ~FLAG_N) | ((result & 0x80) ? FLAG_N : 0);
+            cpu->P = (cpu->P & ~FLAG_V) | ((result & 0x40) ? FLAG_V : 0);
+            if(result == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+
+//移位
+        case OP_ASL: {
+            u8 result = num << 1;
+            cpu->P = (cpu->P & ~FLAG_C) | ((result & 0x80) ? FLAG_C : 0);
+            if(result == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+
+        case OP_LSR: {
+            u8 result = num >> 1;
+            cpu->P = (cpu->P & ~FLAG_C) | ((result & 0x01) ? FLAG_C : 0);
+            if(result == 0) {
+                cpu->P |= FLAG_Z;
+            } else {
+                cpu->P &= ~FLAG_Z;
+            }
+            break;
+        }
+
+        case OP_ROL: {
+            u8 carry = cpu->P & FLAG_N;
+            u8 result = (num << 1) | carry;
+            memory_write(addr, result);
+        }
+
+        case OP_ROR: { 
+            u8 carry = cpu->P & FLAG_C;
+            u8 result = (num << 1) | carry;
+            memory_write(addr, result);
+        }
+
+
+
+
 
 
         case OP_LDA:
