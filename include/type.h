@@ -1,13 +1,9 @@
-#define u8 unsigned char
-#define u16 unsigned short
-#define u32 unsigned int
-#define s8 signed char
-#define s16 signed short
-#define s32 signed int
+#ifndef TYPE_H
+#define TYPE_H
 
-#define true 1
-#define false 0
+typedef unsigned char u8;
+typedef signed char i8;    // 添加有符号8位整数类型
+typedef unsigned short u16;
+typedef unsigned int u32;
 
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif

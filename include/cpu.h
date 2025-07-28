@@ -113,6 +113,7 @@ typedef struct {
     OpType op;
     AddrMode addr_mode;
     u8 cycles;
+    const char *name;    
 } OpInfo;   //代表一条6502CPU指令
 
 extern OpInfo op_info[256];
@@ -123,6 +124,7 @@ void cpu_init(CPU *cpu);
 void set_flag(CPU *cpu, u8 flag);
 u8 get_flag(CPU *cpu);
 void init_op_table();
+OpInfo get_op_type(u8 instruction);
 void clock();   //模拟时钟周期
 void reset(CPU *cpu);
 void irq(CPU *cpu);
