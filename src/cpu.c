@@ -923,7 +923,7 @@ void cpu_run(CPU *cpu) {
     // 检查中断
     check_interrupts(cpu);
     
-    // 正常的指令执行
+    // 正常的指令执行 按照取指-译码-执行周期进行
     OpInfo op = get_op(cpu);    //取指令
     u16 addr = get_operand_address(cpu, op.addr_mode);  //译码
     u8 num = fetch_op_num(addr);
