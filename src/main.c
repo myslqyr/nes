@@ -19,7 +19,7 @@ int main() {
     char *rom_path = malloc(100);
     printf("请输入ROM文件路径: ");
     scanf("%s", rom_path);
-    u8 ret = load_rom(rom_path);
+    u8 ret = load_rom(rom_path);    //将rom加载到内存中
     if(ret != 0) {
         printf("failed to load rom\n");
         return 1;

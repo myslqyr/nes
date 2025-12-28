@@ -12,24 +12,6 @@ void memory_init() {
     }
 }
 
-/* 
-    void memory_write(u16 addr, u8 data);
-    向内存指定区域写入数字
-*/
-void memory_write(u16 addr, u8 data) {
-    assert(addr <=0xFFFF && addr >= 0x0000);
-    memory[addr] = data;
-}
-
-/*
-    u8 memory_read(u16 addr);
-    从指定地址读出一个字节的数据
-*/
-u8 memory_read(u16 addr) {
-    assert(addr <=0xFFFF && addr >= 0x0000);
-    u8 data = memory[addr];
-    return data;
-}
 
 /*读取rom到内存中*/
 u8 load_rom(const char *filename) {
@@ -49,5 +31,13 @@ u8 load_rom(const char *filename) {
         memcpy(&memory[0xC000], &memory[0x8000], 16 * 1024);
     }
     fclose(fp);
+
+    // for (int i = 0; i < 16; i++) {
+    //     printf("rom head[%d]:0x%02X\n", i, rom_head[i]);
+    // }
+    // for (int i = 0; i < 16; i++) {
+    //     printf("memory[0x8000 + %d]:0x%02X\n", i, memory[0x8000 + i]);
+    // }
+
     return 0;
 }

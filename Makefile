@@ -3,7 +3,8 @@ CFLAGS = -Iinclude -Wall -g
 SRCS = src/main.c \
        src/cpu.c \
        src/memory.c \
-       src/irq.c
+       src/irq.c	\
+	   src/bus.c
 OBJS = $(SRCS:.c=.o)
 TARGET = nes
 
