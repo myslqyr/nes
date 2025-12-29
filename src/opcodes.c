@@ -13,7 +13,7 @@
 
 extern OpInfo op_info[256];
 
-/* helper: 设置 Z/N 标志 */
+/* 设置 Z/N 标志 */
 void set_zn_flags(CPU *cpu, u8 v) {
     if (v == 0) cpu->P |= FLAG_Z; else cpu->P &= ~FLAG_Z;
     if (v & 0x80) cpu->P |= FLAG_N; else cpu->P &= ~FLAG_N;
@@ -133,7 +133,7 @@ u8 addr_indy(CPU *cpu) {
     return cpu->page_crossed;
 }
 
-u8 addr_rel(CPU *cpu) {
+u8 addr_rel(CPU *cpu) { //相对寻址
     u8 offset = bus_read(cpu->PC++);
     u16 base_pc = cpu->PC;
     if (offset & 0x80) {
@@ -594,8 +594,6 @@ void init_op_table() {
     op_info[0x79] = (OpInfo){ OP_ADC, ADDR_ABY, 4, "ADC", addr_aby, op_adc };
     op_info[0x61] = (OpInfo){ OP_ADC, ADDR_INDX, 6, "ADC", addr_indx, op_adc };
     op_info[0x71] = (OpInfo){ OP_ADC, ADDR_INDY, 5, "ADC", addr_indy, op_adc };
-
-    // ...（为简洁示例，仅添加部分指令；可以继续按原表补全）
 
     // 分支
     op_info[0x90] = (OpInfo){ OP_BCC, ADDR_REL, 2, "BCC", addr_rel, op_bcc };
