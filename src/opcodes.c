@@ -281,6 +281,11 @@ void op_bit(CPU *cpu) {
     cpu->P = (cpu->P & ~FLAG_V) | (cpu->fetched & FLAG_V);
 }
 
+// BIT指令的绝对寻址版本
+void op_bit_abs(CPU *cpu) {
+    op_bit(cpu);  // 逻辑相同，只是寻址方式不同
+}
+
 void op_asl(CPU *cpu) {
     u8 val = (cpu->operand_addr == 0xFFFF) ? cpu->A : bus_read(cpu->operand_addr);
     u8 res = val << 1;
@@ -464,8 +469,16 @@ void op_rts(CPU *cpu) {
 
 void op_rti(CPU *cpu) {
     cpu->P = pull_stack(cpu);
+    // RTI时清除B标志，因为这不是BRK中断返回
+    cpu->P &= ~FLAG_B;
+    // U标志在6502中未使用，RTI时保持不变或清除
+    cpu->P &= ~FLAG_U;
+
+    // 2. 弹出PC低字节
     u8 lo = pull_stack(cpu);
+    // 3. 弹出PC高字节
     u8 hi = pull_stack(cpu);
+    // 组合成完整的PC
     cpu->PC = (hi << 8) | lo;
 }
 
@@ -598,8 +611,12 @@ void init_op_table() {
     // 分支
     op_info[0x90] = (OpInfo){ OP_BCC, ADDR_REL, 2, "BCC", addr_rel, op_bcc };
     op_info[0xB0] = (OpInfo){ OP_BCS, ADDR_REL, 2, "BCS", addr_rel, op_bcs };
-    op_info[0xD0] = (OpInfo){ OP_BNE, ADDR_REL, 2, "BNE", addr_rel, op_bne };
     op_info[0xF0] = (OpInfo){ OP_BEQ, ADDR_REL, 2, "BEQ", addr_rel, op_beq };
+    op_info[0xD0] = (OpInfo){ OP_BNE, ADDR_REL, 2, "BNE", addr_rel, op_bne };
+    op_info[0x10] = (OpInfo){ OP_BPL, ADDR_REL, 2, "BPL", addr_rel, op_bpl };
+    op_info[0x30] = (OpInfo){ OP_BMI, ADDR_REL, 2, "BMI", addr_rel, op_bmi };
+    op_info[0x50] = (OpInfo){ OP_BVC, ADDR_REL, 2, "BVC", addr_rel, op_bvc };
+    op_info[0x70] = (OpInfo){ OP_BVS, ADDR_REL, 2, "BVS", addr_rel, op_bvs };
 
     // JMP/BRK/JSR/RTS/RTI 示例
     op_info[0x4C] = (OpInfo){ OP_JMP, ADDR_ABS, 3, "JMP", addr_abs, op_jmp };
@@ -667,6 +684,52 @@ void init_op_table() {
     op_info[0xC4] = (OpInfo){ OP_CPY, ADDR_ZP, 3, "CPY", addr_zp, op_cpy };
     op_info[0xCC] = (OpInfo){ OP_CPY, ADDR_ABS, 4, "CPY", addr_abs, op_cpy };
 
+    // AND指令 (逻辑与)
+    op_info[0x29] = (OpInfo){ OP_AND, ADDR_IMM, 2, "AND", addr_imm, op_and };
+    op_info[0x25] = (OpInfo){ OP_AND, ADDR_ZP, 3, "AND", addr_zp, op_and };
+    op_info[0x2D] = (OpInfo){ OP_AND, ADDR_ABS, 4, "AND", addr_abs, op_and };
+    op_info[0x35] = (OpInfo){ OP_AND, ADDR_ZPX, 4, "AND", addr_zpx, op_and };
+    op_info[0x3D] = (OpInfo){ OP_AND, ADDR_ABX, 4, "AND", addr_abx, op_and };
+    op_info[0x39] = (OpInfo){ OP_AND, ADDR_ABY, 4, "AND", addr_aby, op_and };
+    op_info[0x21] = (OpInfo){ OP_AND, ADDR_INDX, 6, "AND", addr_indx, op_and };
+    op_info[0x31] = (OpInfo){ OP_AND, ADDR_INDY, 5, "AND", addr_indy, op_and };
+
+    // BIT指令
+    op_info[0x24] = (OpInfo){ OP_BIT, ADDR_ZP, 3, "BIT", addr_zp, op_bit };
+    op_info[0x2C] = (OpInfo){ OP_BIT, ADDR_ABS, 4, "BIT", addr_abs, op_bit_abs };
+
+    // ORA指令 (逻辑或)
+    op_info[0x09] = (OpInfo){ OP_ORA, ADDR_IMM, 2, "ORA", addr_imm, op_ora };
+    op_info[0x05] = (OpInfo){ OP_ORA, ADDR_ZP, 3, "ORA", addr_zp, op_ora };
+    op_info[0x0D] = (OpInfo){ OP_ORA, ADDR_ABS, 4, "ORA", addr_abs, op_ora };
+    op_info[0x15] = (OpInfo){ OP_ORA, ADDR_ZPX, 4, "ORA", addr_zpx, op_ora };
+    op_info[0x1D] = (OpInfo){ OP_ORA, ADDR_ABX, 4, "ORA", addr_abx, op_ora };
+    op_info[0x19] = (OpInfo){ OP_ORA, ADDR_ABY, 4, "ORA", addr_aby, op_ora };
+    op_info[0x01] = (OpInfo){ OP_ORA, ADDR_INDX, 6, "ORA", addr_indx, op_ora };
+    op_info[0x11] = (OpInfo){ OP_ORA, ADDR_INDY, 5, "ORA", addr_indy, op_ora };
+
+    // EOR指令 (异或)
+    op_info[0x49] = (OpInfo){ OP_EOR, ADDR_IMM, 2, "EOR", addr_imm, op_eor };
+    op_info[0x45] = (OpInfo){ OP_EOR, ADDR_ZP, 3, "EOR", addr_zp, op_eor };
+    op_info[0x4D] = (OpInfo){ OP_EOR, ADDR_ABS, 4, "EOR", addr_abs, op_eor };
+    op_info[0x55] = (OpInfo){ OP_EOR, ADDR_ZPX, 4, "EOR", addr_zpx, op_eor };
+    op_info[0x5D] = (OpInfo){ OP_EOR, ADDR_ABX, 4, "EOR", addr_abx, op_eor };
+    op_info[0x59] = (OpInfo){ OP_EOR, ADDR_ABY, 4, "EOR", addr_aby, op_eor };
+    op_info[0x41] = (OpInfo){ OP_EOR, ADDR_INDX, 6, "EOR", addr_indx, op_eor };
+    op_info[0x51] = (OpInfo){ OP_EOR, ADDR_INDY, 5, "EOR", addr_indy, op_eor };
+
+    // 堆栈操作
+    op_info[0x48] = (OpInfo){ OP_PHA, ADDR_IMPL, 3, "PHA", addr_impl, op_pha };
+    op_info[0x68] = (OpInfo){ OP_PLA, ADDR_IMPL, 4, "PLA", addr_impl, op_pla };
+    op_info[0x08] = (OpInfo){ OP_PHP, ADDR_IMPL, 3, "PHP", addr_impl, op_php };
+    op_info[0x28] = (OpInfo){ OP_PLP, ADDR_IMPL, 4, "PLP", addr_impl, op_plp };
+
+    // 移位指令 (累加器版本)
+    op_info[0x0A] = (OpInfo){ OP_ASL, ADDR_ACC, 2, "ASL", addr_acc, op_asl };
+    op_info[0x4A] = (OpInfo){ OP_LSR, ADDR_ACC, 2, "LSR", addr_acc, op_lsr };
+    op_info[0x2A] = (OpInfo){ OP_ROL, ADDR_ACC, 2, "ROL", addr_acc, op_rol };
+    op_info[0x6A] = (OpInfo){ OP_ROR, ADDR_ACC, 2, "ROR", addr_acc, op_ror };
+
     // 传输指令
     op_info[0xAA] = (OpInfo){ OP_TAX, ADDR_IMPL, 2, "TAX", addr_impl, op_tax };
     op_info[0x8A] = (OpInfo){ OP_TXA, ADDR_IMPL, 2, "TXA", addr_impl, op_txa };
@@ -674,6 +737,9 @@ void init_op_table() {
     op_info[0x98] = (OpInfo){ OP_TYA, ADDR_IMPL, 2, "TYA", addr_impl, op_tya };
     op_info[0xBA] = (OpInfo){ OP_TSX, ADDR_IMPL, 2, "TSX", addr_impl, op_tsx };
     op_info[0x9A] = (OpInfo){ OP_TXS, ADDR_IMPL, 2, "TXS", addr_impl, op_txs };
+
+    // NOP指令
+    op_info[0xEA] = (OpInfo){ OP_NOP, ADDR_IMPL, 2, "NOP", addr_impl, op_nop };
 
     // 标志位操作
     op_info[0x18] = (OpInfo){ OP_CLC, ADDR_IMPL, 2, "CLC", addr_impl, op_clc };
@@ -683,6 +749,27 @@ void init_op_table() {
     op_info[0xD8] = (OpInfo){ OP_CLD, ADDR_IMPL, 2, "CLD", addr_impl, op_cld };
     op_info[0xF8] = (OpInfo){ OP_SED, ADDR_IMPL, 2, "SED", addr_impl, op_sed };
     op_info[0xB8] = (OpInfo){ OP_CLV, ADDR_IMPL, 2, "CLV", addr_impl, op_clv };
+
+    // ASL/LSR/ROL/ROR 内存版本 (之前只注册了累加器版本)
+    op_info[0x06] = (OpInfo){ OP_ASL, ADDR_ZP, 5, "ASL", addr_zp, op_asl };
+    op_info[0x0E] = (OpInfo){ OP_ASL, ADDR_ABS, 6, "ASL", addr_abs, op_asl };
+    op_info[0x16] = (OpInfo){ OP_ASL, ADDR_ZPX, 6, "ASL", addr_zpx, op_asl };
+    op_info[0x1E] = (OpInfo){ OP_ASL, ADDR_ABX, 7, "ASL", addr_abx, op_asl };
+
+    op_info[0x46] = (OpInfo){ OP_LSR, ADDR_ZP, 5, "LSR", addr_zp, op_lsr };
+    op_info[0x4E] = (OpInfo){ OP_LSR, ADDR_ABS, 6, "LSR", addr_abs, op_lsr };
+    op_info[0x56] = (OpInfo){ OP_LSR, ADDR_ZPX, 6, "LSR", addr_zpx, op_lsr };
+    op_info[0x5E] = (OpInfo){ OP_LSR, ADDR_ABX, 7, "LSR", addr_abx, op_lsr };
+
+    op_info[0x26] = (OpInfo){ OP_ROL, ADDR_ZP, 5, "ROL", addr_zp, op_rol };
+    op_info[0x2E] = (OpInfo){ OP_ROL, ADDR_ABS, 6, "ROL", addr_abs, op_rol };
+    op_info[0x36] = (OpInfo){ OP_ROL, ADDR_ZPX, 6, "ROL", addr_zpx, op_rol };
+    op_info[0x3E] = (OpInfo){ OP_ROL, ADDR_ABX, 7, "ROL", addr_abx, op_rol };
+
+    op_info[0x66] = (OpInfo){ OP_ROR, ADDR_ZP, 5, "ROR", addr_zp, op_ror };
+    op_info[0x6E] = (OpInfo){ OP_ROR, ADDR_ABS, 6, "ROR", addr_abs, op_ror };
+    op_info[0x76] = (OpInfo){ OP_ROR, ADDR_ZPX, 6, "ROR", addr_zpx, op_ror };
+    op_info[0x7E] = (OpInfo){ OP_ROR, ADDR_ABX, 7, "ROR", addr_abx, op_ror };
 
     // INC/DEC
     op_info[0xE6] = (OpInfo){ OP_INC, ADDR_ZP, 5, "INC", addr_zp, op_inc };

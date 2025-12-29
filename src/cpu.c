@@ -93,7 +93,7 @@ OpInfo get_op_type(u8 instruction) {
 void cpu_run(CPU *cpu) {
     // 检查中断
     check_interrupts(cpu);
-
+    
     // 基于函数指针的取指-译码-执行流程
     u16 current_pc = cpu->PC;
     u8 opcode = fetch(cpu);

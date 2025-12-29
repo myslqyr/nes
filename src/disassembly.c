@@ -318,6 +318,13 @@ void debug_print_instruction(CPU *cpu, u8 opcode, OpInfo entry, u16 current_pc) 
         offset += sprintf(debug_line + offset, "%s", operand_str);
     }
 
+    // 对于读取类指令，显示读取的值
+    if (entry.op == OP_BIT || entry.op == OP_LDA || entry.op == OP_LDX || entry.op == OP_LDY ||
+        entry.op == OP_CMP || entry.op == OP_CPX || entry.op == OP_CPY ||
+        entry.op == OP_AND || entry.op == OP_ORA || entry.op == OP_EOR) {
+        offset += sprintf(debug_line + offset, " = $%02X", cpu->fetched);
+    }
+
     // 输出寄存器状态
     offset += sprintf(debug_line + offset, "    A:%02X X:%02X Y:%02X P:%02X SP:%02X",
                      cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S);
@@ -333,6 +340,9 @@ void debug_print_instruction(CPU *cpu, u8 opcode, OpInfo entry, u16 current_pc) 
     offset += sprintf(debug_line + offset, "%c", (cpu->P & FLAG_Z) ? 'Z' : 'z');
     offset += sprintf(debug_line + offset, "%c", (cpu->P & FLAG_C) ? 'C' : 'c');
     offset += sprintf(debug_line + offset, "]");
+
+    // 添加PPU状态和周期计数 (简化版)
+    offset += sprintf(debug_line + offset, " PPU:  0,  0 CYC:%u", cpu->cycle);
 
     offset += sprintf(debug_line + offset, "\n");
 

@@ -21,7 +21,7 @@ int main() {
 
     char input[100];
     //scanf("%s", input);
-    strcpy(input, "/home/myslqyr/czh/NES/rom/mario.nes");
+    strcpy(input, "/home/myslqyr/czh/NES/rom/nestest.nes");
     u8 ret = load_rom(input);
     if(ret != 0) {
         printf("failed to load rom: %s\n", input);

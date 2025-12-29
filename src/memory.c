@@ -50,12 +50,11 @@ u8 load_rom(const char *filename) {
 
     fclose(fp);
 
-    // for (int i = 0; i < 16; i++) {
-    //     printf("rom head[%d]:0x%02X\n", i, rom_head[i]);
-    // }
-    // for (int i = 0; i < 16; i++) {
-    //     printf("memory[0x8000 + %d]:0x%02X\n", i, memory[0x8000 + i]);
-    // }
+    // 调试输出：显示设置的向量
+    printf("ROM loaded:\n");
+    printf("NMI vector: 0x%02X%02X (0x%04X)\n", memory[0xFFFB], memory[0xFFFA], (memory[0xFFFB] << 8) | memory[0xFFFA]);
+    printf("Reset vector: 0x%02X%02X (0x%04X)\n", memory[0xFFFD], memory[0xFFFC], (memory[0xFFFD] << 8) | memory[0xFFFC]);
+    printf("IRQ vector: 0x%02X%02X (0x%04X)\n", memory[0xFFFF], memory[0xFFFE], (memory[0xFFFF] << 8) | memory[0xFFFE]);
 
     return 0;
 }
