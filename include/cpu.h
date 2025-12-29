@@ -28,8 +28,13 @@ typedef struct {
     u32 cycle; // 时钟周期
     
     // 中断相关标志
-    bool nmi_pending;   // NMI中断等待处理
+    bool nmi_pending;   // NMI不可屏蔽中断等待处理
     bool irq_pending;   // IRQ中断等待处理
+    
+    // 临时/译码工作区
+    u16 operand_addr; // 寻址计算出的操作数地址
+    u8 fetched;       // 当前指令读取到的操作数（立即数或从内存读出）
+    u8 page_crossed;  // 寻址过程中是否跨页（用于周期补偿）
 } CPU;
 
 typedef enum {
@@ -114,6 +119,9 @@ typedef struct {
     AddrMode addr_mode;
     u8 cycles;
     const char *name;    
+    // 新增：寻址函数与操作函数指针（用于函数指针驱动调度）
+    u8 (*addr_func)(CPU *cpu); // 计算操作数地址/填充 cpu->fetched；返回是否跨页（0/1）
+    void (*op_func)(CPU *cpu); // 执行操作，使用 cpu->fetched 或 memory_read(cpu->operand_addr)
 } OpInfo;   //代表一条6502CPU指令
 
 extern OpInfo op_info[256];
@@ -125,7 +133,7 @@ void set_flag(CPU *cpu, u8 flag);
 u8 get_flag(CPU *cpu);
 void init_op_table();
 OpInfo get_op_type(u8 instruction);
-void clock();   //模拟时钟周期
+void clock_tick();   //模拟时钟周期
 void reset(CPU *cpu);
 void irq(CPU *cpu);
 void nmi(CPU *cpu);
@@ -139,7 +147,6 @@ u16 pull_stack16(CPU *cpu);
 
 u8 fetch(CPU *cpu);     //取指  
 OpInfo get_op(CPU *cpu);
-u16 get_operand_address(CPU *cpu, AddrMode mode); //译码
 u8 fetch_op_num(u16 addr);// 取数
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 void cpu_run(CPU *cpu);

@@ -20,10 +20,6 @@ extern u8 memory[NES_MEM_SIZE];
 
 void memory_init();
 
-//模拟bus连接cpu与memory的通信
-void memory_write(u16 addr, u8 data);
-u8 memory_read(u16 addr);
-
 u8 load_rom(const char *filename);
 
 #endif

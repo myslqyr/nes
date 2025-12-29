@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include "../include/cpu.h"
-#include "../include/memory.h"
+#include "../include/bus.h"
 
 // 中断处理函数
 void reset(CPU *cpu) {
     // 读取复位向量，通电重置后会触发一个RESET中断，也就是会将CPU的指令指针寄存器PC(Program Counter)跳转到RESET中断存储的地址
-    u8 lo = memory_read(RESET_VECTOR);
-    u8 hi = memory_read(RESET_VECTOR + 1);
+    u8 lo = bus_read(RESET_VECTOR);
+    u8 hi = bus_read(RESET_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
     
     // 初始化寄存器
@@ -41,8 +41,8 @@ void irq(CPU *cpu) {
     cpu->P |= FLAG_I;
     
     // 读取中断向量
-    u8 lo = memory_read(IRQ_VECTOR);
-    u8 hi = memory_read(IRQ_VECTOR + 1);
+    u8 lo = bus_read(IRQ_VECTOR);
+    u8 hi = bus_read(IRQ_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
     
     // IRQ需要7个时钟周期
@@ -60,8 +60,8 @@ void nmi(CPU *cpu) {
     cpu->P |= FLAG_I;
     
     // 读取NMI向量
-    u8 lo = memory_read(NMI_VECTOR);
-    u8 hi = memory_read(NMI_VECTOR + 1);
+    u8 lo = bus_read(NMI_VECTOR);
+    u8 hi = bus_read(NMI_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
     
     // NMI需要7个时钟周期
