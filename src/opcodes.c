@@ -445,11 +445,15 @@ void op_pla(CPU *cpu) {
 }
 
 void op_php(CPU *cpu) {
-    push_stack(cpu, cpu->P | FLAG_B);
+    // PHP总是设置B和U标志
+    push_stack(cpu, cpu->P | FLAG_B | FLAG_U);
 }
 
 void op_plp(CPU *cpu) {
     cpu->P = pull_stack(cpu);
+    // PLP清除B标志（因为这不是从BRK返回）
+    cpu->P &= ~FLAG_B;
+    // U标志总是设置
     cpu->P |= FLAG_U;
 }
 
@@ -608,6 +612,16 @@ void init_op_table() {
     op_info[0x61] = (OpInfo){ OP_ADC, ADDR_INDX, 6, "ADC", addr_indx, op_adc };
     op_info[0x71] = (OpInfo){ OP_ADC, ADDR_INDY, 5, "ADC", addr_indy, op_adc };
 
+    // SBC指令 (减法)
+    op_info[0xE9] = (OpInfo){ OP_SBC, ADDR_IMM, 2, "SBC", addr_imm, op_sbc };
+    op_info[0xE5] = (OpInfo){ OP_SBC, ADDR_ZP, 3, "SBC", addr_zp, op_sbc };
+    op_info[0xED] = (OpInfo){ OP_SBC, ADDR_ABS, 4, "SBC", addr_abs, op_sbc };
+    op_info[0xF5] = (OpInfo){ OP_SBC, ADDR_ZPX, 4, "SBC", addr_zpx, op_sbc };
+    op_info[0xFD] = (OpInfo){ OP_SBC, ADDR_ABX, 4, "SBC", addr_abx, op_sbc };
+    op_info[0xF9] = (OpInfo){ OP_SBC, ADDR_ABY, 4, "SBC", addr_aby, op_sbc };
+    op_info[0xE1] = (OpInfo){ OP_SBC, ADDR_INDX, 6, "SBC", addr_indx, op_sbc };
+    op_info[0xF1] = (OpInfo){ OP_SBC, ADDR_INDY, 5, "SBC", addr_indy, op_sbc };
+
     // 分支
     op_info[0x90] = (OpInfo){ OP_BCC, ADDR_REL, 2, "BCC", addr_rel, op_bcc };
     op_info[0xB0] = (OpInfo){ OP_BCS, ADDR_REL, 2, "BCS", addr_rel, op_bcs };
@@ -655,7 +669,7 @@ void init_op_table() {
     op_info[0xA4] = (OpInfo){ OP_LDY, ADDR_ZP, 3, "LDY", addr_zp, op_ldy };
     op_info[0xAC] = (OpInfo){ OP_LDY, ADDR_ABS, 4, "LDY", addr_abs, op_ldy };
     op_info[0xB4] = (OpInfo){ OP_LDY, ADDR_ZPX, 4, "LDY", addr_zpx, op_ldy };
-    op_info[0xBC] = (OpInfo){ OP_LDY, ADDR_ABX, 4, "LDY", addr_abx, op_ldx };
+    op_info[0xBC] = (OpInfo){ OP_LDY, ADDR_ABX, 4, "LDY", addr_abx, op_ldy };
 
     // STX/STY
     op_info[0x86] = (OpInfo){ OP_STX, ADDR_ZP, 3, "STX", addr_zp, op_stx };
