@@ -113,12 +113,12 @@ void cpu_run(CPU *cpu) {
 
     if (is_branch) {
         cpu->cycle += entry.cycles; // 基本周期
-        if (entry.op_func) entry.op_func(cpu);
+        if (entry.op_func) entry.op_func(cpu, entry.addr_mode);
         // 分支操作函数负责在分支被采纳时增加额外的周期（包括跨页）
     } else {
         // 对非分支指令，根据寻址跨页加1周期（若寻址返回 1）
         cpu->cycle += entry.cycles + page;
-        if (entry.op_func) entry.op_func(cpu);
+        if (entry.op_func) entry.op_func(cpu, entry.addr_mode);
     }
     cpu->page_crossed = 0;
 }
