@@ -15,11 +15,12 @@ $4020-$5FFF  扩展
 $6000-$7FFF  SRAM
 $8000-$FFFF  PRG-ROM
 */
-#define NES_MEM_SIZE (1 << 16)   //NES内存分布
+#define NES_MEM_SIZE (1 << 16)   //NES内存分布大小
 extern u8 memory[NES_MEM_SIZE];
+extern u8 ram[0x0800]; // 2KB RAM
+
+
 
 void memory_init();
-
-u8 load_rom(const char *filename);
 
 #endif

@@ -3,6 +3,7 @@
 
 #include "../include/cpu.h"
 #include "../include/memory.h"
+#include "../include/rom.h"
 #include "../include/disassembly.h"
 #include <string.h>
 

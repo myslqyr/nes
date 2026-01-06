@@ -6,7 +6,9 @@ SRCS = src/main.c \
        src/disassembly.c \
        src/memory.c \
        src/irq.c	\
-	   src/bus.c
+	   src/bus.c	\
+	   src/ppu.c	\
+	   src/rom.c	\
 OBJS = $(SRCS:.c=.o)
 TARGET = nes
 
