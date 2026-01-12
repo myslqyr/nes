@@ -17,7 +17,7 @@ $8000-$FFFF  PRG-ROM
 */
 #define NES_MEM_SIZE (1 << 16)   //NES内存分布大小
 extern u8 memory[NES_MEM_SIZE];
-extern u8 ram[0x0800]; // 2KB RAM
+extern u8 cpuRam[0x0800]; // 2KB cpuRAM
 
 
 

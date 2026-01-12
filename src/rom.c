@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-/*读取rom到内存中*/
+// ROM指游戏卡带而非内存中的ROM区域
+
+/*读取rom到内存中,并完成一些初始化工作*/
 u8 load_rom(const char *filename) {
     FILE *fp = fopen(filename, "rb");
     if(fp == NULL) {

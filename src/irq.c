@@ -24,6 +24,7 @@ void reset(CPU *cpu) {
     cpu->irq_pending = false;
     
     // 复位需要7个时钟周期
+    cpu->cycle = 0;
     cpu->cycle += 7;
 }
 

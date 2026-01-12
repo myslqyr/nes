@@ -15,8 +15,15 @@ struct romHead {
     char unused[5]; // 未使用，填充为0
 }; //NES ROM头结构体
 
+//u8 PRGmemory[];
+//u8 CHRmemory[];
 
 u8 load_rom(const char *filename);
+u8 rom_cpu_read(u16 addr);
+void rom_cpu_write(u16 addr, u8 data);
+u8 rom_ppu_read(u16 addr);
+void rom_ppu_write(u16 addr, u8 data);
+
 
 
 
