@@ -46,7 +46,7 @@ const char* format_operand(CPU *cpu, OpInfo op, u16 addr) {
     u8 pc = cpu->PC;
     switch(op.addr_mode) {
         case ADDR_IMM:
-            snprintf(operand_buffer, sizeof(operand_buffer), "#$%02X", bus_read(pc + 1));
+            snprintf(operand_buffer, sizeof(operand_buffer), "#$%02X", cpu_read(pc + 1));
             break;
         case ADDR_ABS:
             snprintf(operand_buffer, sizeof(operand_buffer), "$%04X", addr);
@@ -68,23 +68,23 @@ const char* format_operand(CPU *cpu, OpInfo op, u16 addr) {
             break;
         case ADDR_REL: {
             // 相对寻址显示目标地址
-            i8 offset = (i8)bus_read(pc + 1);
+            i8 offset = (i8)cpu_read(pc + 1);
             u16 target = pc + 2 + offset;
             snprintf(operand_buffer, sizeof(operand_buffer), "$%02X(%+d)", (u8)target, offset);
             break;
         }
         case ADDR_IND: {
-            u16 ptr = (bus_read(pc + 2) << 8) | bus_read(pc + 1);
+            u16 ptr = (cpu_read(pc + 2) << 8) | cpu_read(pc + 1);
             snprintf(operand_buffer, sizeof(operand_buffer), "($%04X)", ptr);
             break;
         }
         case ADDR_INDX: {
-            u8 zp = bus_read(pc + 1);
+            u8 zp = cpu_read(pc + 1);
             snprintf(operand_buffer, sizeof(operand_buffer), "($%02X,X)", zp);
             break;
         }
         case ADDR_INDY: {
-            u8 zp = bus_read(pc + 1);
+            u8 zp = cpu_read(pc + 1);
             snprintf(operand_buffer, sizeof(operand_buffer), "($%02X),Y", zp);
             break;
         }
@@ -104,14 +104,14 @@ static u16 peek_operand_address(CPU *cpu, u16 pc, AddrMode mode) {
         case ADDR_IMM:
             return 0; // immediate has no address (operand at pc+1)
         case ADDR_ABS: {
-            u8 lo = bus_read(pc + 1);
-            u8 hi = bus_read(pc + 2);
+            u8 lo = cpu_read(pc + 1);
+            u8 hi = cpu_read(pc + 2);
             return (hi << 8) | lo;
         }
         case ADDR_ABX:
         case ADDR_ABY: {
-            u8 lo = bus_read(pc + 1);
-            u8 hi = bus_read(pc + 2);
+            u8 lo = cpu_read(pc + 1);
+            u8 hi = cpu_read(pc + 2);
             return (hi << 8) | lo; // disassembler reports base address
         }
         case ADDR_ZP:
@@ -121,10 +121,10 @@ static u16 peek_operand_address(CPU *cpu, u16 pc, AddrMode mode) {
         case ADDR_INDY:
         case ADDR_REL:
             // these encodings use a single extra byte
-            return (u16)bus_read(pc + 1);
+            return (u16)cpu_read(pc + 1);
         case ADDR_IND: {
-            u8 lo = bus_read(pc + 1);
-            u8 hi = bus_read(pc + 2);
+            u8 lo = cpu_read(pc + 1);
+            u8 hi = cpu_read(pc + 2);
             return (hi << 8) | lo;
         }
         case ADDR_ACC:
@@ -136,7 +136,7 @@ static u16 peek_operand_address(CPU *cpu, u16 pc, AddrMode mode) {
 
 void disassemble_instruction(CPU *cpu) {
     u16 pc = cpu->PC;
-    u8 opcode = bus_read(pc);
+    u8 opcode = cpu_read(pc);
     OpInfo op = get_op_type(opcode);
     u16 addr = peek_operand_address(cpu, pc, op.addr_mode);
     
@@ -152,13 +152,13 @@ void disassemble_instruction(CPU *cpu) {
         case ADDR_INDX:
         case ADDR_INDY:
         case ADDR_REL:
-            printf("%02X    ", bus_read(pc + 1));
+            printf("%02X    ", cpu_read(pc + 1));
             break;
         case ADDR_ABS:
         case ADDR_ABX:
         case ADDR_ABY:
         case ADDR_IND:
-            printf("%02X %02X ", bus_read(pc + 1), bus_read(pc + 2));
+            printf("%02X %02X ", cpu_read(pc + 1), cpu_read(pc + 2));
             break;
         default:
             printf("     ");
@@ -180,7 +180,7 @@ void disassemble_range(CPU *cpu, u16 start_addr, u16 end_addr) {
         disassemble_instruction(cpu);
         
         // 根据指令的寻址方式增加PC
-        OpInfo op = get_op_type(bus_read(current));
+        OpInfo op = get_op_type(cpu_read(current));
         switch(op.addr_mode) {
             case ADDR_ABS:
             case ADDR_ABX:
@@ -214,58 +214,58 @@ void format_operand_for_debug(CPU *cpu, OpInfo entry, char *buffer, size_t buffe
             snprintf(buffer, buffer_size, "A");
             break;
         case ADDR_IMM:
-            snprintf(buffer, buffer_size, "#$%02X", bus_read(current_pc + 1));
+            snprintf(buffer, buffer_size, "#$%02X", cpu_read(current_pc + 1));
             break;
         case ADDR_ABS:
             {
-                u8 lo = bus_read(current_pc + 1);
-                u8 hi = bus_read(current_pc + 2);
+                u8 lo = cpu_read(current_pc + 1);
+                u8 hi = cpu_read(current_pc + 2);
                 u16 addr = (hi << 8) | lo;
                 snprintf(buffer, buffer_size, "$%04X", addr);
             }
             break;
         case ADDR_ABX:
             {
-                u8 lo = bus_read(current_pc + 1);
-                u8 hi = bus_read(current_pc + 2);
+                u8 lo = cpu_read(current_pc + 1);
+                u8 hi = cpu_read(current_pc + 2);
                 u16 addr = (hi << 8) | lo;
                 snprintf(buffer, buffer_size, "$%04X,X", addr);
             }
             break;
         case ADDR_ABY:
             {
-                u8 lo = bus_read(current_pc + 1);
-                u8 hi = bus_read(current_pc + 2);
+                u8 lo = cpu_read(current_pc + 1);
+                u8 hi = cpu_read(current_pc + 2);
                 u16 addr = (hi << 8) | lo;
                 snprintf(buffer, buffer_size, "$%04X,Y", addr);
             }
             break;
         case ADDR_ZP:
-            snprintf(buffer, buffer_size, "$%02X", bus_read(current_pc + 1));
+            snprintf(buffer, buffer_size, "$%02X", cpu_read(current_pc + 1));
             break;
         case ADDR_ZPX:
-            snprintf(buffer, buffer_size, "$%02X,X", bus_read(current_pc + 1));
+            snprintf(buffer, buffer_size, "$%02X,X", cpu_read(current_pc + 1));
             break;
         case ADDR_ZPY:
-            snprintf(buffer, buffer_size, "$%02X,Y", bus_read(current_pc + 1));
+            snprintf(buffer, buffer_size, "$%02X,Y", cpu_read(current_pc + 1));
             break;
         case ADDR_IND:
             {
-                u8 lo = bus_read(current_pc + 1);
-                u8 hi = bus_read(current_pc + 2);
+                u8 lo = cpu_read(current_pc + 1);
+                u8 hi = cpu_read(current_pc + 2);
                 u16 addr = (hi << 8) | lo;
                 snprintf(buffer, buffer_size, "($%04X)", addr);
             }
             break;
         case ADDR_INDX:
-            snprintf(buffer, buffer_size, "($%02X,X)", bus_read(current_pc + 1));
+            snprintf(buffer, buffer_size, "($%02X,X)", cpu_read(current_pc + 1));
             break;
         case ADDR_INDY:
-            snprintf(buffer, buffer_size, "($%02X),Y", bus_read(current_pc + 1));
+            snprintf(buffer, buffer_size, "($%02X),Y", cpu_read(current_pc + 1));
             break;
         case ADDR_REL:
             {
-                i8 offset = (i8)bus_read(current_pc + 1);
+                i8 offset = (i8)cpu_read(current_pc + 1);
                 u16 target = current_pc + 2 + offset;
                 snprintf(buffer, buffer_size, "$%04X", target);
             }
@@ -297,13 +297,13 @@ void debug_print_instruction(CPU *cpu, u8 opcode, OpInfo entry, u16 current_pc) 
         case ADDR_INDX:
         case ADDR_INDY:
         case ADDR_REL:
-            offset += sprintf(debug_line + offset, " %02X      ", bus_read(current_pc + 1));
+            offset += sprintf(debug_line + offset, " %02X      ", cpu_read(current_pc + 1));
             break;
         case ADDR_ABS:
         case ADDR_ABX:
         case ADDR_ABY:
         case ADDR_IND:
-            offset += sprintf(debug_line + offset, " %02X %02X   ", bus_read(current_pc + 1), bus_read(current_pc + 2));
+            offset += sprintf(debug_line + offset, " %02X %02X   ", cpu_read(current_pc + 1), cpu_read(current_pc + 2));
             break;
         case ADDR_IMPL:
         case ADDR_ACC:

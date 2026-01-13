@@ -1,5 +1,5 @@
-#ifndef ROM_H 
-#define ROM_H
+#ifndef CARTRIDGE_H 
+#define CARTRIDGE_H
 
 #include "type.h"
 
@@ -19,11 +19,10 @@ struct romHead {
 //u8 CHRmemory[];
 
 u8 load_rom(const char *filename);
-u8 rom_cpu_read(u16 addr);
-void rom_cpu_write(u16 addr, u8 data);
-u8 rom_ppu_read(u16 addr);
-void rom_ppu_write(u16 addr, u8 data);
-
+u8 cartridge_cpu_read(u16 addr);
+void cartridge_cpu_write(u16 addr, u8 data);
+u8 cartridge_ppu_read(u16 addr);
+void cartridge_ppu_write(u16 addr, u8 data);
 
 
 

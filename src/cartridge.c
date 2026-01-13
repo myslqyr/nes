@@ -1,9 +1,8 @@
-#include "../include/rom.h"
+#include "../include/cartridge.h"
 #include "../include/memory.h"
 #include <stdio.h>
 #include <string.h>
 
-// ROM指游戏卡带而非内存中的ROM区域
 
 /*读取rom到内存中,并完成一些初始化工作*/
 u8 load_rom(const char *filename) {

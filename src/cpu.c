@@ -8,7 +8,7 @@ OpInfo op_info[256];
 
 // 堆栈操作辅助函数,堆栈固定在第一个页中
 void push_stack(CPU *cpu, u8 value) {
-    bus_write(0x100 + cpu->S, value);
+    cpu_write(0x100 + cpu->S, value);
     cpu->S--;
 }
 
@@ -19,7 +19,7 @@ void push_stack16(CPU *cpu, u16 value) {
 
 u8 pull_stack(CPU *cpu) {
     cpu->S++;
-    return bus_read(0x100 + cpu->S);
+    return cpu_read(0x100 + cpu->S);
 }
 
 u16 pull_stack16(CPU *cpu) {
@@ -49,7 +49,7 @@ u8 get_flag(CPU *cpu) {
 /* init_op_table moved to src/opcodes.c */
 
 u8 fetch(CPU *cpu) {
-    return bus_read(cpu->PC++);
+    return cpu_read(cpu->PC++);
 }
 
 
@@ -65,7 +65,7 @@ u8 fetch_op_num(u16 addr) {
     if(addr == (u16)0) {
         return (u8)0; // 旧逻辑用全局 fetched；现在应使用 cpu->fetched，函数签名无法取到 cpu 指针
     } else {
-        return bus_read(addr);
+        return cpu_read(addr);
     }
 }
 

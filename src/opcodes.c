@@ -34,107 +34,107 @@ u8 addr_acc(CPU *cpu) {
 
 u8 addr_imm(CPU *cpu) {
     cpu->operand_addr = cpu->PC;
-    cpu->fetched = bus_read(cpu->PC++);
+    cpu->fetched = cpu_read(cpu->PC++);
     return 0;
 }
 
 u8 addr_abs(CPU *cpu) {
-    u8 lo = bus_read(cpu->PC++);
-    u8 hi = bus_read(cpu->PC++);
+    u8 lo = cpu_read(cpu->PC++);
+    u8 hi = cpu_read(cpu->PC++);
     u16 addr = (hi << 8) | lo;
     cpu->operand_addr = addr;
-    cpu->fetched = bus_read(addr);
+    cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
 
 u8 addr_abx(CPU *cpu) {
-    u8 lo = bus_read(cpu->PC++);
-    u8 hi = bus_read(cpu->PC++);
+    u8 lo = cpu_read(cpu->PC++);
+    u8 hi = cpu_read(cpu->PC++);
     u16 abs = (hi << 8) | lo;
     u16 final = abs + cpu->X;
     cpu->operand_addr = final;
-    cpu->fetched = bus_read(final);
+    cpu->fetched = cpu_read(final);
     cpu->page_crossed = ((final & 0xFF00) != (abs & 0xFF00)) ? 1 : 0;
     return cpu->page_crossed;
 }
 
 u8 addr_aby(CPU *cpu) {
-    u8 lo = bus_read(cpu->PC++);
-    u8 hi = bus_read(cpu->PC++);
+    u8 lo = cpu_read(cpu->PC++);
+    u8 hi = cpu_read(cpu->PC++);
     u16 abs = (hi << 8) | lo;
     u16 final = abs + cpu->Y;
     cpu->operand_addr = final;
-    cpu->fetched = bus_read(final);
+    cpu->fetched = cpu_read(final);
     cpu->page_crossed = ((final & 0xFF00) != (abs & 0xFF00)) ? 1 : 0;
     return cpu->page_crossed;
 }
 
 u8 addr_zp(CPU *cpu) {
-    u8 a = bus_read(cpu->PC++);
+    u8 a = cpu_read(cpu->PC++);
     cpu->operand_addr = a & 0xFF;
-    cpu->fetched = bus_read(cpu->operand_addr);
+    cpu->fetched = cpu_read(cpu->operand_addr);
     cpu->page_crossed = 0;
     return 0;
 }
 
 u8 addr_zpx(CPU *cpu) {
-    u8 base = bus_read(cpu->PC++);
+    u8 base = cpu_read(cpu->PC++);
     u8 addr = (base + cpu->X) & 0xFF;
     cpu->operand_addr = addr;
-    cpu->fetched = bus_read(addr);
+    cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
 
 u8 addr_zpy(CPU *cpu) {
-    u8 base = bus_read(cpu->PC++);
+    u8 base = cpu_read(cpu->PC++);
     u8 addr = (base + cpu->Y) & 0xFF;
     cpu->operand_addr = addr;
-    cpu->fetched = bus_read(addr);
+    cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
 
 u8 addr_ind(CPU *cpu) {
-    u8 lo = bus_read(cpu->PC++);
-    u8 hi = bus_read(cpu->PC++);
+    u8 lo = cpu_read(cpu->PC++);
+    u8 hi = cpu_read(cpu->PC++);
     u16 ptr = (hi << 8) | lo;
-    u8 nlo = bus_read(ptr);
-    u8 nhi = ((ptr & 0x00FF) == 0x00FF) ? bus_read(ptr & 0xFF00) : bus_read(ptr + 1);
+    u8 nlo = cpu_read(ptr);
+    u8 nhi = ((ptr & 0x00FF) == 0x00FF) ? cpu_read(ptr & 0xFF00) : cpu_read(ptr + 1);
     u16 addr = (nhi << 8) | nlo;
     cpu->operand_addr = addr;
-    cpu->fetched = bus_read(addr);
+    cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
 
 u8 addr_indx(CPU *cpu) {
-    u8 zp = bus_read(cpu->PC++);
+    u8 zp = cpu_read(cpu->PC++);
     u8 ptr = (zp + cpu->X) & 0xFF;
-    u8 lo = bus_read(ptr);
-    u8 hi = bus_read((ptr + 1) & 0xFF);
+    u8 lo = cpu_read(ptr);
+    u8 hi = cpu_read((ptr + 1) & 0xFF);
     u16 addr = (hi << 8) | lo;
     cpu->operand_addr = addr;
-    cpu->fetched = bus_read(addr);
+    cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
 
 u8 addr_indy(CPU *cpu) {
-    u8 zp = bus_read(cpu->PC++);
-    u8 lo = bus_read(zp);
-    u8 hi = bus_read((zp + 1) & 0xFF);
+    u8 zp = cpu_read(cpu->PC++);
+    u8 lo = cpu_read(zp);
+    u8 hi = cpu_read((zp + 1) & 0xFF);
     u16 base = (hi << 8) | lo;
     u16 final = base + cpu->Y;
     cpu->operand_addr = final;
-    cpu->fetched = bus_read(final);
+    cpu->fetched = cpu_read(final);
     cpu->page_crossed = ((final & 0xFF00) != (base & 0xFF00)) ? 1 : 0;
     return cpu->page_crossed;
 }
 
 u8 addr_rel(CPU *cpu) { //相对寻址
-    u8 offset = bus_read(cpu->PC++);
+    u8 offset = cpu_read(cpu->PC++);
     u16 base_pc = cpu->PC;
     if (offset & 0x80) {
         base_pc = cpu->PC + (offset | 0xFF00);
@@ -166,7 +166,7 @@ void op_lda(CPU *cpu, AddrMode mode) {
 
 void op_sta(CPU *cpu, AddrMode mode) {
     (void)mode;  // STA总是写到内存
-    bus_write(cpu->operand_addr, cpu->A);
+    cpu_write(cpu->operand_addr, cpu->A);
 }
 
 void op_adc(CPU *cpu, AddrMode mode) {
@@ -222,16 +222,16 @@ void op_brk(CPU *cpu, AddrMode mode) {
     push_stack(cpu, ret & 0xFF);
     push_stack(cpu, cpu->P | FLAG_B);
     cpu->P |= FLAG_I;
-    u8 lo = bus_read(IRQ_VECTOR);
-    u8 hi = bus_read(IRQ_VECTOR + 1);
+    u8 lo = cpu_read(IRQ_VECTOR);
+    u8 hi = cpu_read(IRQ_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
 }
 
 void op_inc(CPU *cpu, AddrMode mode) {
     (void)mode;  // INC总是操作内存
-    u8 v = bus_read(cpu->operand_addr);
+    u8 v = cpu_read(cpu->operand_addr);
     v++;
-    bus_write(cpu->operand_addr, v);
+    cpu_write(cpu->operand_addr, v);
     set_zn_flags(cpu, v);
 }
 
@@ -249,9 +249,9 @@ void op_iny(CPU *cpu, AddrMode mode) {
 
 void op_dec(CPU *cpu, AddrMode mode) {
     (void)mode;  // DEC总是操作内存
-    u8 v = bus_read(cpu->operand_addr);
+    u8 v = cpu_read(cpu->operand_addr);
     v--;
-    bus_write(cpu->operand_addr, v);
+    cpu_write(cpu->operand_addr, v);
     set_zn_flags(cpu, v);
 }
 
@@ -315,7 +315,7 @@ void op_asl(CPU *cpu, AddrMode mode) {
     if (mode == ADDR_ACC) {
         cpu->A = res;
     } else {
-        bus_write(cpu->operand_addr, res);
+        cpu_write(cpu->operand_addr, res);
     }
 }
 
@@ -332,7 +332,7 @@ void op_lsr(CPU *cpu, AddrMode mode) {
     if (mode == ADDR_ACC) {
         cpu->A = res;
     } else {
-        bus_write(cpu->operand_addr, res);
+        cpu_write(cpu->operand_addr, res);
     }
 }
 
@@ -349,7 +349,7 @@ void op_rol(CPU *cpu, AddrMode mode) {
     if (mode == ADDR_ACC) {
         cpu->A = res;
     } else {
-        bus_write(cpu->operand_addr, res);
+        cpu_write(cpu->operand_addr, res);
     }
 }
 
@@ -366,7 +366,7 @@ void op_ror(CPU *cpu, AddrMode mode) {
     if (mode == ADDR_ACC) {
         cpu->A = res;
     } else {
-        bus_write(cpu->operand_addr, res);
+        cpu_write(cpu->operand_addr, res);
     }
 }
 
@@ -533,12 +533,12 @@ void op_ldy(CPU *cpu, AddrMode mode) {
 
 void op_stx(CPU *cpu, AddrMode mode) {
     (void)mode;  // STX总是写到内存
-    bus_write(cpu->operand_addr, cpu->X);
+    cpu_write(cpu->operand_addr, cpu->X);
 }
 
 void op_sty(CPU *cpu, AddrMode mode) {
     (void)mode;  // STY总是写到内存
-    bus_write(cpu->operand_addr, cpu->Y);
+    cpu_write(cpu->operand_addr, cpu->Y);
 }
 
 void op_cmp(CPU *cpu, AddrMode mode) {

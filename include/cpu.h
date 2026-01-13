@@ -118,7 +118,7 @@ typedef struct {
     OpType op;
     AddrMode addr_mode;
     u8 cycles;
-    const char *name;
+    const char *name;    
     // 新增：寻址函数与操作函数指针（用于函数指针驱动调度）
     u8 (*addr_func)(CPU *cpu); // 计算操作数地址/填充 cpu->fetched；返回是否跨页（0/1）
     void (*op_func)(CPU *cpu, AddrMode mode); // 执行操作，使用 cpu->fetched 或 memory_read(cpu->operand_addr)
