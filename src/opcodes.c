@@ -10,8 +10,8 @@ extern OpInfo op_info[256];
 
 /* 设置 Z/N 标志 */
 void set_zn_flags(CPU *cpu, u8 v) {
-    if (v == 0) cpu->P |= FLAG_Z; else cpu->P &= ~FLAG_Z;
-    if (v & 0x80) cpu->P |= FLAG_N; else cpu->P &= ~FLAG_N;
+    set_flag(cpu, FLAG_Z, v == 0);
+    set_flag(cpu, FLAG_N, (v & 0x80) != 0);
 }
 
 /* 寻址函数 */
@@ -167,42 +167,26 @@ void op_sta(CPU *cpu, AddrMode mode) {
 void op_adc(CPU *cpu, AddrMode mode) {
     (void)mode;  // ADC总是使用fetched值
     u8 m = cpu->fetched;
-    u8 carry = (cpu->P & FLAG_C) ? 1 : 0;
+    u8 carry = get_flag(cpu, FLAG_C) ? 1 : 0;
     u16 res = (u16)cpu->A + (u16)m + carry;
     u8 old = cpu->A;
     cpu->A = res & 0xFF;
-    if (res > 0xFF) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, res > 0xFF);
     set_zn_flags(cpu, cpu->A);
-    if (((old ^ m) & 0x80) == 0 && ((old ^ cpu->A) & 0x80) != 0) {
-        cpu->P |= FLAG_V;
-    } else {
-        cpu->P &= ~FLAG_V;
-    }
+    set_flag(cpu, FLAG_V, (((old ^ m) & 0x80) == 0 && ((old ^ cpu->A) & 0x80) != 0));
 }
 
 void op_sbc(CPU *cpu, AddrMode mode) {
     (void)mode;  // SBC总是使用fetched值
     u8 m = cpu->fetched;
-    u8 carry = (cpu->P & FLAG_C) ? 1 : 0;
+    u8 carry = get_flag(cpu, FLAG_C) ? 1 : 0;
     u16 value = m ^ 0xFF;
     u16 res = (u16)cpu->A + value + carry;
     u8 old = cpu->A;
     cpu->A = res & 0xFF;
-    if (res > 0xFF) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, res > 0xFF);
     set_zn_flags(cpu, cpu->A);
-    if (((old ^ value) & 0x80) == 0 && ((old ^ cpu->A) & 0x80) != 0) {
-        cpu->P |= FLAG_V;
-    } else {
-        cpu->P &= ~FLAG_V;
-    }
+    set_flag(cpu, FLAG_V, (((old ^ value) & 0x80) == 0 && ((old ^ cpu->A) & 0x80) != 0));
 }
 
 void op_jmp(CPU *cpu, AddrMode mode) {
@@ -216,7 +200,7 @@ void op_brk(CPU *cpu, AddrMode mode) {
     push_stack(cpu, (ret >> 8) & 0xFF);
     push_stack(cpu, ret & 0xFF);
     push_stack(cpu, cpu->P | FLAG_B);
-    cpu->P |= FLAG_I;
+    set_flag(cpu, FLAG_I, true);
     u8 lo = cpu_read(IRQ_VECTOR);
     u8 hi = cpu_read(IRQ_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
@@ -283,13 +267,9 @@ void op_eor(CPU *cpu, AddrMode mode) {
 void op_bit(CPU *cpu, AddrMode mode) {
     (void)mode;  // BIT总是使用fetched值
     u8 r = cpu->A & cpu->fetched;
-    if (r == 0) {
-        cpu->P |= FLAG_Z;
-    } else {
-        cpu->P &= ~FLAG_Z;
-    }
-    cpu->P = (cpu->P & ~FLAG_N) | (cpu->fetched & FLAG_N);
-    cpu->P = (cpu->P & ~FLAG_V) | (cpu->fetched & FLAG_V);
+    set_flag(cpu, FLAG_Z, r == 0);
+    set_flag(cpu, FLAG_N, (cpu->fetched & FLAG_N) != 0);
+    set_flag(cpu, FLAG_V, (cpu->fetched & FLAG_V) != 0);
 }
 
 // BIT指令的绝对寻址版本
@@ -301,11 +281,7 @@ void op_bit_abs(CPU *cpu, AddrMode mode) {
 void op_asl(CPU *cpu, AddrMode mode) {
     u8 val = (mode == ADDR_ACC) ? cpu->A : cpu->fetched;
     u8 res = val << 1;
-    if (val & 0x80) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, (val & 0x80) != 0);
     set_zn_flags(cpu, res);
     if (mode == ADDR_ACC) {
         cpu->A = res;
@@ -317,12 +293,8 @@ void op_asl(CPU *cpu, AddrMode mode) {
 void op_lsr(CPU *cpu, AddrMode mode) {
     u8 val = (mode == ADDR_ACC) ? cpu->A : cpu->fetched;
     u8 res = val >> 1;
-    if (val & 0x01) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
-    cpu->P &= ~FLAG_N;
+    set_flag(cpu, FLAG_C, (val & 0x01) != 0);
+    set_flag(cpu, FLAG_N, false);
     set_zn_flags(cpu, res);
     if (mode == ADDR_ACC) {
         cpu->A = res;
@@ -333,13 +305,9 @@ void op_lsr(CPU *cpu, AddrMode mode) {
 
 void op_rol(CPU *cpu, AddrMode mode) {
     u8 val = (mode == ADDR_ACC) ? cpu->A : cpu->fetched;
-    u8 oldc = (cpu->P & FLAG_C) ? 1 : 0;
+    u8 oldc = get_flag(cpu, FLAG_C) ? 1 : 0;
     u8 res = (val << 1) | oldc;
-    if (val & 0x80) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, (val & 0x80) != 0);
     set_zn_flags(cpu, res);
     if (mode == ADDR_ACC) {
         cpu->A = res;
@@ -350,13 +318,9 @@ void op_rol(CPU *cpu, AddrMode mode) {
 
 void op_ror(CPU *cpu, AddrMode mode) {
     u8 val = (mode == ADDR_ACC) ? cpu->A : cpu->fetched;
-    u8 oldc = (cpu->P & FLAG_C) ? 0x80 : 0;
+    u8 oldc = get_flag(cpu, FLAG_C) ? 0x80 : 0;
     u8 res = (val >> 1) | oldc;
-    if (val & 0x01) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, (val & 0x01) != 0);
     set_zn_flags(cpu, res);
     if (mode == ADDR_ACC) {
         cpu->A = res;
@@ -368,7 +332,7 @@ void op_ror(CPU *cpu, AddrMode mode) {
 /* 分支函数 */
 void op_bcc(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_C) == 0) {
+    if (!get_flag(cpu, FLAG_C)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -379,7 +343,7 @@ void op_bcc(CPU *cpu, AddrMode mode) {
 
 void op_bcs(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_C) != 0) {
+    if (get_flag(cpu, FLAG_C)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -390,7 +354,7 @@ void op_bcs(CPU *cpu, AddrMode mode) {
 
 void op_beq(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_Z) != 0) {
+    if (get_flag(cpu, FLAG_Z)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -401,7 +365,7 @@ void op_beq(CPU *cpu, AddrMode mode) {
 
 void op_bne(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_Z) == 0) {
+    if (!get_flag(cpu, FLAG_Z)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -412,7 +376,7 @@ void op_bne(CPU *cpu, AddrMode mode) {
 
 void op_bpl(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_N) == 0) {
+    if (!get_flag(cpu, FLAG_N)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -423,7 +387,7 @@ void op_bpl(CPU *cpu, AddrMode mode) {
 
 void op_bmi(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_N) != 0) {
+    if (get_flag(cpu, FLAG_N)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -434,7 +398,7 @@ void op_bmi(CPU *cpu, AddrMode mode) {
 
 void op_bvc(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_V) == 0) {
+    if (!get_flag(cpu, FLAG_V)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -445,7 +409,7 @@ void op_bvc(CPU *cpu, AddrMode mode) {
 
 void op_bvs(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
-    if ((cpu->P & FLAG_V) != 0) {
+    if (get_flag(cpu, FLAG_V)) {
         cpu->PC = cpu->operand_addr;
         cpu->cycle += 1;
         if (cpu->page_crossed) {
@@ -476,9 +440,9 @@ void op_plp(CPU *cpu, AddrMode mode) {
     (void)mode;  // PLP是隐含寻址
     cpu->P = pull_stack(cpu);
     // PLP清除B标志（因为这不是从BRK返回）
-    cpu->P &= ~FLAG_B;
+    set_flag(cpu, FLAG_B, false);
     // U标志总是设置
-    cpu->P |= FLAG_U;
+    set_flag(cpu, FLAG_U, true);
 }
 
 void op_jsr(CPU *cpu, AddrMode mode) {
@@ -501,9 +465,9 @@ void op_rti(CPU *cpu, AddrMode mode) {
     (void)mode;  // RTI是隐含寻址
     cpu->P = pull_stack(cpu);
     // RTI时清除B标志，因为这不是BRK中断返回
-    cpu->P &= ~FLAG_B;
+    set_flag(cpu, FLAG_B, false);
     // U标志在6502中未使用，RTI时保持不变或清除
-    cpu->P &= ~FLAG_U;
+    set_flag(cpu, FLAG_U, false);
 
     // 2. 弹出PC低字节
     u8 lo = pull_stack(cpu);
@@ -539,33 +503,21 @@ void op_sty(CPU *cpu, AddrMode mode) {
 void op_cmp(CPU *cpu, AddrMode mode) {
     (void)mode;  // CMP总是使用fetched值
     u16 res = (u16)cpu->A - (u16)cpu->fetched;
-    if (cpu->A >= cpu->fetched) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, cpu->A >= cpu->fetched);
     set_zn_flags(cpu, res & 0xFF);
 }
 
 void op_cpx(CPU *cpu, AddrMode mode) {
     (void)mode;  // CPX总是使用fetched值
     u16 res = (u16)cpu->X - (u16)cpu->fetched;
-    if (cpu->X >= cpu->fetched) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, cpu->X >= cpu->fetched);
     set_zn_flags(cpu, res & 0xFF);
 }
 
 void op_cpy(CPU *cpu, AddrMode mode) {
     (void)mode;  // CPY总是使用fetched值
     u16 res = (u16)cpu->Y - (u16)cpu->fetched;
-    if (cpu->Y >= cpu->fetched) {
-        cpu->P |= FLAG_C;
-    } else {
-        cpu->P &= ~FLAG_C;
-    }
+    set_flag(cpu, FLAG_C, cpu->Y >= cpu->fetched);
     set_zn_flags(cpu, res & 0xFF);
 }
 
@@ -606,37 +558,37 @@ void op_txs(CPU *cpu, AddrMode mode) {
 
 void op_clc(CPU *cpu, AddrMode mode) {
     (void)mode;  // CLC是隐含寻址
-    cpu->P &= ~FLAG_C;
+    set_flag(cpu, FLAG_C, false);
 }
 
 void op_sec(CPU *cpu, AddrMode mode) {
     (void)mode;  // SEC是隐含寻址
-    cpu->P |= FLAG_C;
+    set_flag(cpu, FLAG_C, true);
 }
 
 void op_cli(CPU *cpu, AddrMode mode) {
     (void)mode;  // CLI是隐含寻址
-    cpu->P &= ~FLAG_I;
+    set_flag(cpu, FLAG_I, false);
 }
 
 void op_sei(CPU *cpu, AddrMode mode) {
     (void)mode;  // SEI是隐含寻址
-    cpu->P |= FLAG_I;
+    set_flag(cpu, FLAG_I, true);
 }
 
 void op_cld(CPU *cpu, AddrMode mode) {
     (void)mode;  // CLD是隐含寻址
-    cpu->P &= ~FLAG_D;
+    set_flag(cpu, FLAG_D, false);
 }
 
 void op_sed(CPU *cpu, AddrMode mode) {
     (void)mode;  // SED是隐含寻址
-    cpu->P |= FLAG_D;
+    set_flag(cpu, FLAG_D, true);
 }
 
 void op_clv(CPU *cpu, AddrMode mode) {
     (void)mode;  // CLV是隐含寻址
-    cpu->P &= ~FLAG_V;
+    set_flag(cpu, FLAG_V, false);
 }
 
 /* 初始化 opcode 表并绑定函数指针 */

@@ -141,8 +141,8 @@ extern OpInfo op_info[256];
 typedef void (*OpFunc)(CPU *cpu, AddrMode mode);
 
 void cpu_init(CPU *cpu);
-void set_flag(CPU *cpu, u8 flag);
-u8 get_flag(CPU *cpu);
+void set_flag(CPU *cpu, u8 flag, bool value);
+bool get_flag(CPU *cpu, u8 flag);
 void init_op_table();
 OpInfo get_op_type(u8 instruction);
 void clock_tick();   //模拟时钟周期

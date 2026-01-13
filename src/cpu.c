@@ -31,20 +31,26 @@ u16 pull_stack16(CPU *cpu) {
 
 /*
     void set_flag(CPU *cpu, u8 flag, bool value)
-    设置标志位
-    flag: 标志位
+    设置或清除标志位
+    flag: 标志位掩码
+    value: true=设置, false=清除
 */
-
-void set_flag(CPU *cpu, u8 flag) {
-    cpu->P |= flag;
+void set_flag(CPU *cpu, u8 flag, bool value) {
+    if (value) {
+        cpu->P |= flag;
+    } else {
+        cpu->P &= ~flag;
+    }
 }
 
 /*
-    u8 get_flag(CPU *cpu)
-    获取标志位
+    bool get_flag(CPU *cpu, u8 flag)
+    获取特定标志位的状态
+    flag: 标志位掩码
+    返回: true=已设置, false=未设置
 */
-u8 get_flag(CPU *cpu) {
-    return cpu->P;
+bool get_flag(CPU *cpu, u8 flag) {
+    return (cpu->P & flag) != 0;
 }
 
 /* init_op_table moved to src/opcodes.c */
