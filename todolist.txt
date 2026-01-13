@@ -1,22 +1,22 @@
 🥇 阶段 1：把 CPU 跑“完全对”（必须先做）
 ✅ 1.1 修正 Flag 接口（立刻做）
 
-重写 set_flag(cpu, flag, bool)
+✅ 重写 set_flag(cpu, flag, bool)
 
-重写 get_flag(cpu, flag)
+✅ 重写 get_flag(cpu, flag)
 
-新增 set_zn(cpu, value)（设置 Z / N）
+✅ 新增 set_zn(cpu, value)（设置 Z / N）
 
 📌 目标：
 所有算术 / 逻辑指令 flag 行为正确
 
 ✅ 1.2 统一 fetched 模型
 
-把 fetched 放进 CPU 结构体
+✅把 fetched 放进 CPU 结构体
 
-所有 opcode 从 cpu->fetched 取操作数
+✅所有 opcode 从 cpu->fetched 取操作数
 
-删除 fetch_op_num() 的特殊逻辑
+✅删除 fetch_op_num() 的特殊逻辑
 
 📌 目标：
 读 / 写指令语义不混乱

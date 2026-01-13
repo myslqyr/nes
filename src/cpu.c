@@ -67,15 +67,6 @@ OpInfo get_op(CPU *cpu) {
     return op;
 }
 
-
-u8 fetch_op_num(u16 addr) {
-    if(addr == (u16)0) {
-        return (u8)0; // 旧逻辑用全局 fetched；现在应使用 cpu->fetched，函数签名无法取到 cpu 指针
-    } else {
-        return cpu_read(addr);
-    }
-}
-
 //TODO:集中处理各个标志位
 void set_cpu_p(CPU *cpu, u8 num) {
     return ;

@@ -159,7 +159,6 @@ u16 pull_stack16(CPU *cpu);
 
 u8 fetch(CPU *cpu);     //取指  
 OpInfo get_op(CPU *cpu);
-u8 fetch_op_num(u16 addr);// 取数
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 void cpu_run(CPU *cpu);
 

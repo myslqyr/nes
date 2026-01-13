@@ -2,7 +2,6 @@
 #include "../include/cpu.h"
 #include "../include/cartridge.h"
 #include "../include/ppu.h"
-#include <assert.h>
 
 /* 
     void cpu_write(u16 addr, u8 data);
@@ -26,6 +25,7 @@ u8 cpu_read(u16 addr) {
         // PPU寄存器镜像
         data = ppu_cpu_read(addr & 0x0007);
     } else if (addr >= 0x8000 && addr <= 0xFFFF) {
+        // 从cartridge读取PRG-ROM数据
         data = cartridge_cpu_read(addr);
     }
     return data;
