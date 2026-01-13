@@ -1,47 +1,63 @@
 #include "../include/cartridge.h"
-#include "../include/memory.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 
-/*读取rom到内存中,并完成一些初始化工作*/
-u8 load_rom(const char *filename) {
+static u8 *prg_rom = NULL;
+static u8 *chr_rom = NULL;
+static int prg_rom_size = 0;
+static int chr_rom_size = 0;
+
+bool cartridge_load(const char *filename) {
     FILE *fp = fopen(filename, "rb");
-    if(fp == NULL) {
-        printf("failed to open rom:%s\n",filename);
-        return -1;
+    if (!fp) {
+        printf("Failed to open ROM: %s\n", filename);
+        return false;
     }
 
-    // 读取 iNES 头
-    struct romHead header;
-    if (fread(&header, 1, sizeof(header), fp) != sizeof(header)) {
-        printf("failed to read rom header\n");
+    iNESHeader header;
+    fread(&header, 1, sizeof(header), fp);
+
+    if (memcmp(header.name, "NES\x1A", 4) != 0) {
+        printf("Not a valid iNES file\n");
         fclose(fp);
-        return -1;
-    }
-    int prg_size = header.prg_rom_chunks * 16 * 1024; // PRG-ROM大小
-    int chr_size = header.chr_rom_chunks * 8 * 1024;  // CHR-ROM大小
-
-    // 读取PRG-ROM
-    fread(&memory[0x8000], 1, prg_size, fp);
-
-    // 如果PRG-ROM只有16KB，镜像到0xC000
-    if(prg_size == 16 * 1024) {
-        memcpy(&memory[0xC000], &memory[0x8000], 16 * 1024);
+        return false;
     }
 
-    // 跳过CHR-ROM数据 (如果有的话)
-    if(chr_size > 0) {
-        fseek(fp, chr_size, SEEK_CUR);
+    //跳过 Trainer
+    if (header.mapper1 & 0x04) {
+        fseek(fp, 512, SEEK_CUR);
+    }
+
+    prg_rom_size = header.prg_rom_chunks * 16 * 1024;
+    chr_rom_size = header.chr_rom_chunks * 8 * 1024;
+
+    prg_rom = malloc(prg_rom_size);
+    fread(prg_rom, 1, prg_rom_size, fp);
+
+    if (chr_rom_size > 0) {
+        chr_rom = malloc(chr_rom_size);
+        fread(chr_rom, 1, chr_rom_size, fp);
     }
 
     fclose(fp);
 
-    // 调试输出：显示设置的向量
-    printf("ROM loaded:\n");
-    printf("NMI vector: 0x%02X%02X (0x%04X)\n", memory[0xFFFB], memory[0xFFFA], (memory[0xFFFB] << 8) | memory[0xFFFA]);
-    printf("Reset vector: 0x%02X%02X (0x%04X)\n", memory[0xFFFD], memory[0xFFFC], (memory[0xFFFD] << 8) | memory[0xFFFC]);
-    printf("IRQ vector: 0x%02X%02X (0x%04X)\n", memory[0xFFFF], memory[0xFFFE], (memory[0xFFFF] << 8) | memory[0xFFFE]);
+    printf("ROM loaded: PRG=%dKB CHR=%dKB\n",
+           prg_rom_size / 1024,
+           chr_rom_size / 1024);
 
+    return true;
+}
+
+
+u8 cartridge_cpu_read(u16 addr) {
+    if (addr >= 0x8000) {
+        if (prg_rom_size == 16 * 1024) //16KB
+            return prg_rom[(addr - 0x8000) & 0x3FFF];
+        else
+            return prg_rom[addr - 0x8000];
+    }
     return 0;
 }

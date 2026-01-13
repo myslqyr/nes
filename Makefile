@@ -4,7 +4,6 @@ SRCS = src/main.c \
 	src/cpu.c \
 	src/opcodes.c \
 	src/disassembly.c \
-	src/memory.c \
 	src/irq.c \
 	src/bus.c \
 	src/ppu.c \

@@ -1,0 +1,102 @@
+🥇 阶段 1：把 CPU 跑“完全对”（必须先做）
+✅ 1.1 修正 Flag 接口（立刻做）
+
+重写 set_flag(cpu, flag, bool)
+
+重写 get_flag(cpu, flag)
+
+新增 set_zn(cpu, value)（设置 Z / N）
+
+📌 目标：
+所有算术 / 逻辑指令 flag 行为正确
+
+✅ 1.2 统一 fetched 模型
+
+把 fetched 放进 CPU 结构体
+
+所有 opcode 从 cpu->fetched 取操作数
+
+删除 fetch_op_num() 的特殊逻辑
+
+📌 目标：
+读 / 写指令语义不混乱
+
+✅ 1.3 跑 nestest.log（CPU-only）
+
+下载 nestest.nes
+
+只实现 CPU + Bus + Cartridge（不画图）
+
+PC / A / X / Y / P / SP / cycle 逐行对齐
+
+📌 完成标志：
+nestest.log 100% 对齐
+
+⚠️ 在这之前，不要写 PPU、不写游戏
+
+🥈 阶段 2：重构 Cartridge（核心分水岭）
+✅ 2.1 拆掉 memory[0x8000] = ROM
+
+删除 ROM → memory 的 memcpy
+
+Cartridge 持有 prg_rom / chr_rom
+
+Bus 通过 Cartridge 读 PRG
+
+📌 关键认知：
+卡带 = 外设，不是内存
+
+✅ 2.2 实现 Mapper 0（NROM）
+
+解析 iNES header
+
+支持 PRG 16KB / 32KB
+
+实现：
+
+u8 cartridge_cpu_read(u16 addr);
+
+
+📌 完成标志：
+Reset Vector 来自 cartridge
+
+✅ 2.3 Bus 映射完整化
+
+CPU RAM（0x0000–1FFF）
+
+PPU 寄存器（0x2000–3FFF）
+
+Cartridge（0x4020–FFFF）
+
+Stub 掉 APU / IO
+
+📌 完成标志：
+CPU 能从 $8000 执行指令
+
+🥉 阶段 3：最小 PPU（只为“不死机”）
+
+⚠️ 不是画画阶段，只是为了跑游戏
+
+✅ 3.1 PPU 寄存器行为（最小）
+
+$2000 / $2001（写即可）
+
+$2002（读清 VBlank）
+
+$2005 / $2006（写两次）
+
+$2007（VRAM 读写）
+
+📌 完成标志：
+游戏不在启动时卡死
+
+✅ 3.2 OAM DMA（4014）
+
+实现 $4014 写
+
+从 CPU RAM 复制 256 字节到 PPU OAM
+
+CPU stall 513 / 514 cycles
+
+📌 完成标志：
+马里奥不再花屏

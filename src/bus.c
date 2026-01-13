@@ -1,5 +1,6 @@
 #include "../include/bus.h"
-#include "../include/memory.h"
+#include "../include/cpu.h"
+#include "../include/cartridge.h"
 #include "../include/ppu.h"
 #include <assert.h>
 
@@ -24,6 +25,8 @@ u8 cpu_read(u16 addr) {
     } else if(addr >= 0x2000 && addr <= 0x3FFF) {
         // PPU寄存器镜像
         data = ppu_cpu_read(addr & 0x0007);
+    } else if (addr >= 0x8000 && addr <= 0xFFFF) {
+        data = cartridge_cpu_read(addr);
     }
     return data;
 }

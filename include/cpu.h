@@ -4,6 +4,18 @@
 #include "type.h"
 #include <stdbool.h>
 
+/* cpu内存分布
+$0000-$07FF  2KB RAM
+$0800-$1FFF  RAM镜像
+$2000-$2007  PPU寄存器
+$2008-$3FFF  PPU寄存器镜像
+$4000-$4017  APU/I/O寄存器
+$4018-$401F  测试用途
+$4020-$5FFF  扩展
+$6000-$7FFF  SRAM
+$8000-$FFFF  PRG-ROM
+*/
+
 // 中断向量地址
 #define NMI_VECTOR    0xFFFA  // NMI中断向量地址
 #define RESET_VECTOR  0xFFFC  // RESET中断向量地址
@@ -121,7 +133,7 @@ typedef struct {
     const char *name;    
     // 新增：寻址函数与操作函数指针（用于函数指针驱动调度）
     u8 (*addr_func)(CPU *cpu); // 计算操作数地址/填充 cpu->fetched；返回是否跨页（0/1）
-    void (*op_func)(CPU *cpu, AddrMode mode); // 执行操作，使用 cpu->fetched 或 memory_read(cpu->operand_addr)
+    void (*op_func)(CPU *cpu, AddrMode mode); // 执行操作
 } OpInfo;   //代表一条6502CPU指令
 
 extern OpInfo op_info[256];
@@ -151,6 +163,6 @@ u8 fetch_op_num(u16 addr);// 取数
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 void cpu_run(CPU *cpu);
 
-//寻址方式
+extern u8 cpuRam[0x0800]; // 2KB cpuRAM
 
 #endif

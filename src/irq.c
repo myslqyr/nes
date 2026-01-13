@@ -5,10 +5,10 @@
 // 中断处理函数
 void reset(CPU *cpu) {
     // 读取复位向量，通电重置后会触发一个RESET中断，也就是会将CPU的指令指针寄存器PC(Program Counter)跳转到RESET中断存储的地址
-    // u8 lo = cpu_read(RESET_VECTOR);
-    // u8 hi = cpu_read(RESET_VECTOR + 1);
-    //cpu->PC = (hi << 8) | lo;
-    cpu->PC = 0xC000;
+    u8 lo = cpu_read(RESET_VECTOR);
+    u8 hi = cpu_read(RESET_VECTOR + 1);
+    cpu->PC = (hi << 8) | lo;
+    //cpu->PC = 0xC000;
     
     // 初始化寄存器
     cpu->A = 0;

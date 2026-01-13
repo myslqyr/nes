@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "../include/cpu.h"
-#include "../include/memory.h"
 #include "../include/cartridge.h"
 #include "../include/disassembly.h"
 #include <string.h>
@@ -15,7 +14,6 @@ int main() {
     }
 
     init_op_table();
-    memory_init();
     debug_log_init();
 
     printf("输入ROM文件路径运行游戏:\n");
@@ -23,8 +21,8 @@ int main() {
     char input[100];
     //scanf("%s", input);
     strcpy(input, "/home/myslqyr/czh/NES/rom/nestest.nes");
-    u8 ret = load_rom(input);
-    if(ret != 0) {
+    bool ret = cartridge_load(input);
+    if(!ret) {
         printf("failed to load rom: %s\n", input);
         return 1;
     }

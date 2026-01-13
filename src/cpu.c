@@ -4,6 +4,7 @@
 #include "../include/disassembly.h"
 
 OpInfo op_info[256];
+u8 cpuRam[0x0800] = {0}; // 2KB cpuRAM
 
 
 // 堆栈操作辅助函数,堆栈固定在第一个页中

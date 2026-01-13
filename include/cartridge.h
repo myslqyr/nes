@@ -2,8 +2,9 @@
 #define CARTRIDGE_H
 
 #include "type.h"
+#include <stdbool.h>
 
-struct romHead {
+typedef struct  {
     char name[4];   // "NES" + 0x1A
     u8 prg_rom_chunks;  // 16KB为单位的PRG-ROM块数
     u8 chr_rom_chunks;  // 8KB为单位的CHR-ROM块数
@@ -13,12 +14,12 @@ struct romHead {
     u8 tv_system1;      // TV系统（控制字节3）
     u8 tv_system2;    // TV系统（控制字节4）
     char unused[5]; // 未使用，填充为0
-}; //NES ROM头结构体
+} iNESHeader; //NES ROM头结构体
 
 //u8 PRGmemory[];
 //u8 CHRmemory[];
 
-u8 load_rom(const char *filename);
+bool cartridge_load(const char *filename);
 u8 cartridge_cpu_read(u16 addr);
 void cartridge_cpu_write(u16 addr, u8 data);
 u8 cartridge_ppu_read(u16 addr);

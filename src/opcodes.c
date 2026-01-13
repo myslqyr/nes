@@ -3,13 +3,8 @@
  * 把指令实现与寻址从 cpu 核心拆出，集中管理 opcode 表与函数指针映射
  */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "../include/cpu.h"
-#include "../include/memory.h"
 #include "../include/bus.h"
-#include "../include/irq.h"
 
 extern OpInfo op_info[256];
 
