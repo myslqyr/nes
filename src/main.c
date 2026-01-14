@@ -4,12 +4,15 @@
 #include "../include/cpu.h"
 #include "../include/cartridge.h"
 #include "../include/disassembly.h"
+#include "../include/ppu.h"
 #include <string.h>
 
 int main() {
     CPU *cpu = (CPU *)malloc(sizeof(CPU));
-    if (cpu == NULL) {
-        printf("Failed to allocate memory for CPU\n");
+    PPU *ppu = (PPU *)malloc(sizeof(PPU));
+
+    if (cpu == NULL || ppu == NULL) {
+        printf("Failed to allocate memory for CPU or PPU\n");
         return 1;
     }
 
@@ -29,6 +32,7 @@ int main() {
 
     // 在ROM加载后初始化CPU，这样reset()才能读取正确的向量
     cpu_init(cpu);
+    ppu_init(ppu);
     printf("开始运行游戏...\n");
     printf("按Ctrl+C停止\n\n");
     while(1) {

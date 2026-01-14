@@ -19,12 +19,20 @@ void cpu_write(u16 addr, u8 data) {
 
 u8 cpu_read(u16 addr) {
     u8 data = 0;
-    if(addr >= 0x0000 && addr <= 0x1FFF) {
+    if(addr >= 0x0000 && addr <= 0x1FFF) { // 8KB范围 映射2KB ram镜像
         data = cpuRam[addr & 0x07FF]; // 2KB RAM镜像
     } else if(addr >= 0x2000 && addr <= 0x3FFF) {
         // PPU寄存器镜像
         data = ppu_cpu_read(addr & 0x0007);
-    } else if (addr >= 0x8000 && addr <= 0xFFFF) {
+    } else if (addr >= 0x4000 && addr <= 0x4017) {
+        
+    } else if (addr >= 0x4018 && addr <= 0x401F) {
+
+    } else if (addr >= 0x4020 && addr <= 0x5FFF) {
+
+    } else if (addr >= 0x6000 && addr <= 0x7FFF) {
+
+    }else if (addr >= 0x8000 && addr <= 0xFFFF) {
         // 从cartridge读取PRG-ROM数据
         data = cartridge_cpu_read(addr);
     }
