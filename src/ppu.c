@@ -1,6 +1,10 @@
 #include "../include/type.h"
 #include "../include/ppu.h"
 
+PPU *ppu;
+u8 tblName[2][1024];
+u8 tblPalette[32];
+
 void ppu_init(PPU *ppu) {
     //TODO
     return;
