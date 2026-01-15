@@ -16,7 +16,7 @@ extern u8 tblPalette[32];   // 调色板
 
 /*cpu-ppu寄存器*/
 
-union PPUCTRL //0x2000
+union PPUCTRL //0x2000,包含一些控制PPU的位 write 
 	{
 		struct
 		{
@@ -33,7 +33,7 @@ union PPUCTRL //0x2000
 		u8 reg;
 	};
 
-union PPUMASK  //0x2001
+union PPUMASK  //0x2001，控制PPU渲染图形和精灵的位 write
 	{
 		struct
 		{
@@ -50,7 +50,7 @@ union PPUMASK  //0x2001
 		u8 reg;
 	};
 
-union PPUSTATUS //0x2002
+union PPUSTATUS //0x2002,反映与渲染相关事件的状态，主要用于时序控制。read
 	{
 		struct
 		{
@@ -95,8 +95,8 @@ typedef struct {
     union PPUSTATUS status; // $2002
     u8 oam_addr;   // $2003
     u8 oam_data;   // $2004
-    u8 scroll; // $2005 (写 latch)
-    u8 PPUADDR;   // $2006 (写 latch)
+    u8 scroll; // $2005 
+    u8 PPUADDR;   // $2006 
     u8 PPUDATA;   // $2007
 
     // -------- 内部状态 --------
