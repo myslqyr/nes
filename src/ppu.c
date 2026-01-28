@@ -26,6 +26,8 @@ u8 ppu_read(u16 addr) {
     addr &= 0x3FFF;
 
     if (addr <= 0x1FFF && addr >= 0x0000) {
+        /*数组的第1维通过检查PPU地址的最高二进制位来确定是选择左边的拼图还是右边的拼图
+        数组的第2维通过屏蔽PPU地址中剩余的二进制位来计算该内存中的偏移量*/
         return tblPattern[(addr & 0x1000) >> 12][addr & 0x0FFF];
     } else if (addr >= 0x2000 && addr <= 0x3EFF) {
         addr &= 0x0FFF;
@@ -84,55 +86,126 @@ void ppu_write(u16 addr, u8 data) {
     }
 }
 
-u8 ppu_cpu_read(u16 addr) {
-    switch (addr)
-    {
-    case 0x0000:    // PPUCTRL
+u8 ppu_cpu_read(u16 addr, bool rdonly) {
+    u8 data = 0x00;
+    if (ppu == NULL) {
         return 0;
-    case 0x0001:    // PPUMASK
-        return 0;
-    case 0x0002:    // PPUSTATUS
-        return 0;
-    case 0x0003:    // OAMADDR
-        return 0;
-    case 0x0004:    // OAMDATA
-        return 0;
-    case 0x0005:    // PPUSCROLL
-        return 0;
-    case 0x0006:    // PPUADDR
-        return 0;
-    case 0x0007:    // PPUDATA
-        return 0;
-    default:
-        break;
     }
-    return 0;
+
+    if (rdonly) {
+        switch (addr) {
+        case 0x0000:    // PPUCTRL
+            data = ppu->control.reg;
+            break;
+        case 0x0001:    // PPUMASK
+            data = ppu->mask.reg;
+            break;
+        case 0x0002:    // PPUSTATUS
+            data = ppu->status.reg;
+            break;
+        case 0x0003:    // OAMADDR  
+            break;
+        case 0x0004:    // OAMDATA
+            break;
+        case 0x0005:    
+            break;
+        case 0x0006:
+            break;
+        case 0x0007:    // PPUDATA
+            break;
+        default:
+            break;
+        }
+        return data;
+    }
+    else {
+        switch (addr) {
+        case 0x0000:    // PPUCTRL (not readable)
+            break;
+        case 0x0001:    // PPUMASK (not readable)
+            break;
+        case 0x0002:    // PPUSTATUS
+            data = (ppu->status.reg & 0xE0) | (ppu->ppu_data_buffer & 0x1F);
+            ppu->status.vertical_blank = 0;
+            ppu->addr_latch = 0;
+            break;
+        case 0x0003:    // OAMADDR
+            break;
+        case 0x0004:    // OAMDATA
+            break;
+        case 0x0005:    // PPUSCROLL
+            break;
+        case 0x0006:    // PPUADDR
+            break;
+        case 0x0007:    // PPUDATA
+            data = ppu->ppu_data_buffer;
+            ppu->ppu_data_buffer = ppu_read(ppu->vram_addr);
+            if (ppu->vram_addr >= 0x3F00) {
+                data = ppu->ppu_data_buffer;
+            }
+            ppu->vram_addr += (ppu->control.increment_mode ? 32 : 1);
+            break;
+        default:
+            break;
+        }
+    }
+    return data;
 }
 
 void ppu_cpu_write(u16 addr, u8 data) {
-     switch (addr)
+    if (ppu == NULL) {
+        return;
+    }
+
+    switch (addr)
     {
     case 0x0000:    // PPUCTRL
         ppu->control.reg = data;
+        ppu->tram_addr = (ppu->tram_addr & 0xF3FF) | ((ppu->control.nametable_y << 11) | (ppu->control.nametable_x << 10));
         break;
     case 0x0001:    // PPUMASK
         ppu->mask.reg = data;
         break;
     case 0x0002:    // PPUSTATUS
-        ppu->status.reg = data;
         break;
     case 0x0003:    // OAMADDR
-        return ;
+        ppu->oam_addr = data;
+        break;
     case 0x0004:    // OAMDATA
-        return ;
+        ppu->oam[ppu->oam_addr] = data;
+        break;
     case 0x0005:    // PPUSCROLL
-        return ;
+        if (ppu->addr_latch == 0)
+        {
+            ppu->fine_x = data & 0x07;
+            ppu->tram_addr = (ppu->tram_addr & 0xFFE0) | (data >> 3);
+            ppu->addr_latch = 1;
+        }
+        else
+        {
+            ppu->tram_addr = (ppu->tram_addr & 0x8FFF) | ((data & 0x07) << 12);
+            ppu->tram_addr = (ppu->tram_addr & 0xFC1F) | ((data & 0xF8) << 2);
+            ppu->addr_latch = 0;
+        }
+        break;
     case 0x0006:    // PPUADDR
-        return ;
+        if (ppu->addr_latch == 0)
+        {
+            ppu->tram_addr = (ppu->tram_addr & 0x00FF) | ((data & 0x3F) << 8);
+            ppu->addr_latch = 1;
+        }
+        else
+        {
+            ppu->tram_addr = (ppu->tram_addr & 0xFF00) | data;
+            ppu->vram_addr = ppu->tram_addr;
+            ppu->addr_latch = 0;
+        }
+        break;
     case 0x0007:    // PPUDATA
-        return ;
+        ppu_write(ppu->vram_addr, data);
+        ppu->vram_addr += (ppu->control.increment_mode ? 32 : 1);
+        break;
     default:
         break;
     }
-    return;
 }

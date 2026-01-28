@@ -23,7 +23,7 @@ u8 cpu_read(u16 addr) {
         data = cpuRam[addr & 0x07FF]; // 2KB RAM镜像
     } else if(addr >= 0x2000 && addr <= 0x3FFF) {
         // PPU寄存器镜像
-        data = ppu_cpu_read(addr & 0x0007);
+        data = ppu_cpu_read(addr & 0x0007, false);
     } else if (addr >= 0x4000 && addr <= 0x4017) {
         
     } else if (addr >= 0x4018 && addr <= 0x401F) {

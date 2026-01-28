@@ -7,7 +7,7 @@
 u8 ppu_read(u16 addr);
 void ppu_write(u16 addr, u8 data);//与ppu总线通信
 
-u8 ppu_cpu_read(u16 addr);
+u8 ppu_cpu_read(u16 addr, bool rdonly);
 void ppu_cpu_write(u16 addr, u8 data);//将ppu连接到cpu总线上,与总主线通信
 
 extern u8 tblName[2][1024]; // 名称表
@@ -103,7 +103,8 @@ typedef struct {
     u16 vram_addr;   // 当前 VRAM 地址
     u16 tram_addr;   // 临时地址
     u8 fine_x;
-    bool addr_latch;
+    bool addr_latch;	
+    u8 ppu_data_buffer;
 
     // -------- 内存 --------
     u8 vram[2048];    // Nametable
