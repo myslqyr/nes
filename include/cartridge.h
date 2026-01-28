@@ -16,10 +16,16 @@ typedef struct  {
     char unused[5]; // 未使用，填充为0
 } iNESHeader; //NES ROM头结构体
 
+typedef enum {
+    MIRROR_HORIZONTAL = 0,
+    MIRROR_VERTICAL = 1
+} MirrorMode;
+
 //u8 PRGmemory[];
 //u8 CHRmemory[];
 
 bool cartridge_load(const char *filename);
+MirrorMode cartridge_get_mirror(void);
 u8 cartridge_cpu_read(u16 addr);
 void cartridge_cpu_write(u16 addr, u8 data);
 u8 cartridge_ppu_read(u16 addr);

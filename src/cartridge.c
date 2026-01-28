@@ -9,6 +9,11 @@ static u8 *prg_rom = NULL;
 static u8 *chr_rom = NULL;
 static int prg_rom_size = 0;
 static int chr_rom_size = 0;
+static MirrorMode mirror_mode = MIRROR_HORIZONTAL;
+
+MirrorMode cartridge_get_mirror(void) {
+    return mirror_mode;
+}
 
 bool cartridge_load(const char *filename) {
     FILE *fp = fopen(filename, "rb");
@@ -33,6 +38,7 @@ bool cartridge_load(const char *filename) {
 
     prg_rom_size = header.prg_rom_chunks * 16 * 1024;
     chr_rom_size = header.chr_rom_chunks * 8 * 1024;
+    mirror_mode = (header.mapper1 & 0x01) ? MIRROR_VERTICAL : MIRROR_HORIZONTAL;
 
     prg_rom = malloc(prg_rom_size);
     fread(prg_rom, 1, prg_rom_size, fp);

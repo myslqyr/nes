@@ -85,8 +85,8 @@ union loopy_register
 
 typedef struct {
     // -------- 时序 --------
-    u8 cycle;        // 0-340
-    u8 scanline;     // -1 ~ 260
+    u16 cycle;        // 0-340
+    i16 scanline;     // -1 ~ 260
     u64 frame;
 
     // -------- 寄存器 --------
