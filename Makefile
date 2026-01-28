@@ -7,7 +7,9 @@ SRCS = src/main.c \
 	src/irq.c \
 	src/bus.c \
 	src/ppu.c \
-	src/cartridge.c
+	src/cartridge.c \
+	src/mapper.c \
+	src/mapper0.c
 OBJS = $(SRCS:.c=.o)
 TARGET = nes
 
