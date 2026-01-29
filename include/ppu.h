@@ -103,8 +103,8 @@ typedef struct {
     u16 vram_addr;   // 当前 VRAM 地址
     u16 tram_addr;   // 临时地址
     u8 fine_x;
-    bool addr_latch;	
-    u8 ppu_data_buffer;
+    bool addr_latch;	//地址锁存器
+    u8 ppu_data_buffer; //PPU数据缓存
 
     // -------- 内存 --------
     u8 vram[2048];    // Nametable
