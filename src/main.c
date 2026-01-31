@@ -5,6 +5,7 @@
 #include "../include/cartridge.h"
 #include "../include/disassembly.h"
 #include "../include/ppu.h"
+#include "../include/sdl.h"
 #include <string.h>
 
 int main() {
@@ -33,11 +34,16 @@ int main() {
     // 在ROM加载后初始化CPU，这样reset()才能读取正确的向量
     cpu_init(cpu);
     ppu_init(ppu);
+    sdl_init();
     printf("开始运行游戏...\n");
     printf("按Ctrl+C停止\n\n");
     while(1) {
+        if (sdl_poll_quit()) {
+            break;
+        }
         cpu_run(cpu);
     }
+    sdl_shutdown();
     debug_log_close();
     free(cpu);  // 清理内存
     return 0;
