@@ -39,6 +39,7 @@ void ppu_init(PPU *ppu) {
     memset(ppu, 0, sizeof(PPU));
     memset(tblName, 0, sizeof(tblName));
     memset(tblPalette, 0, sizeof(tblPalette));
+    ppu->nmi = false;
 }
 
 /*图像存储器（pattern memory）在内存地址$0000~$1FFF区域，
@@ -150,6 +151,7 @@ u8 ppu_cpu_read(u16 addr, bool rdonly) {
         case 0x0001:    // PPUMASK (not readable)
             break;
         case 0x0002:    // PPUSTATUS
+            ppu->status.vertical_blank = 1;
             data = (ppu->status.reg & 0xE0) | (ppu->ppu_data_buffer & 0x1F);
             ppu->status.vertical_blank = 0;
             ppu->addr_latch = 0;
@@ -191,7 +193,7 @@ void ppu_cpu_write(u16 addr, u8 data) {
     case 0x0001:    // PPUMASK
         ppu->mask.reg = data;
         break;
-    case 0x0002:    // PPUSTATUS
+    case 0x0002:    // PPUSTATUS，只读
         break;
     case 0x0003:    // OAMADDR
         ppu->oam_addr = data;
@@ -221,7 +223,7 @@ void ppu_cpu_write(u16 addr, u8 data) {
         }
         else
         {
-            ppu->tram_addr = (ppu->tram_addr & 0xFF00) | data;
+            ppu->tram_addr = (ppu->tram_addr & 0x00FF) | ((data & 0x3F) << 8);
             ppu->vram_addr = ppu->tram_addr;
             ppu->addr_latch = 0;
         }
@@ -257,4 +259,13 @@ void GetPatternTable (u8 index, u8 palette) {
 
 u32 GetColourFromPalette (u8 palette, u8 pixel) {
     return NES_PALETTE_RGBA[ppu_read(0x3F00 + (palette << 2) +pixel)];
+}
+
+void ppu_clock(PPU *ppu) { 
+    if(ppu->scanline == 241 && ppu->cycle == 1) {
+        ppu->status.vertical_blank = 1;
+        if(ppu->control.enable_nmi) {
+            ppu->nmi = true;
+        }
+    }
 }

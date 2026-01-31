@@ -85,8 +85,8 @@ union loopy_register
 
 typedef struct {
     // -------- 时序 --------
-    u16 cycle;        // 0-340
-    i16 scanline;     // -1 ~ 260
+    u16 cycle;        // 0-340  周期
+    i16 scanline;     // -1 ~ 260  扫描线
     u64 frame;
 
     // -------- 寄存器 --------
@@ -103,8 +103,9 @@ typedef struct {
     u16 vram_addr;   // 当前 VRAM 地址
     u16 tram_addr;   // 临时地址
     u8 fine_x;
-    bool addr_latch;	//地址锁存器
+    u8 addr_latch;	//地址锁存器
     u8 ppu_data_buffer; //PPU数据缓存
+	u16 ppu_addr;//保存编译好的内存地址
 
     // -------- 内存 --------
     u8 vram[2048];    // Nametable
