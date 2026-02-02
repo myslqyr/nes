@@ -334,9 +334,9 @@ void op_bcc(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (!get_flag(cpu, FLAG_C)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -345,9 +345,9 @@ void op_bcs(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (get_flag(cpu, FLAG_C)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -356,9 +356,9 @@ void op_beq(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (get_flag(cpu, FLAG_Z)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -367,9 +367,9 @@ void op_bne(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (!get_flag(cpu, FLAG_Z)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -378,9 +378,9 @@ void op_bpl(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (!get_flag(cpu, FLAG_N)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -389,9 +389,9 @@ void op_bmi(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (get_flag(cpu, FLAG_N)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -400,9 +400,9 @@ void op_bvc(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (!get_flag(cpu, FLAG_V)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }
@@ -411,9 +411,9 @@ void op_bvs(CPU *cpu, AddrMode mode) {
     (void)mode;  // 分支指令都是相对寻址
     if (get_flag(cpu, FLAG_V)) {
         cpu->PC = cpu->operand_addr;
-        cpu->cycle += 1;
+        cpu->cycles_left += 1;
         if (cpu->page_crossed) {
-            cpu->cycle += 1;
+            cpu->cycles_left += 1;
         }
     }
 }

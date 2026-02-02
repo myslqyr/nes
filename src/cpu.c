@@ -87,11 +87,8 @@ OpInfo get_op_type(u8 instruction) {
 
 
 
-/*模拟CPU的执行过程*/
+/*模拟CPU的执行过程（执行一条指令并设置周期）*/
 void cpu_run(CPU *cpu) {
-    // 检查中断
-    check_interrupts(cpu);
-    
     // 基于函数指针的取指-译码-执行流程
     u16 current_pc = cpu->PC;
     u8 opcode = fetch(cpu);
@@ -109,14 +106,13 @@ void cpu_run(CPU *cpu) {
     // 分支指令的周期补偿需要在操作执行时处理（仅当分支被采纳时）
     bool is_branch = (entry.op == OP_BCC || entry.op == OP_BCS || entry.op == OP_BEQ || entry.op == OP_BNE || entry.op == OP_BPL || entry.op == OP_BMI || entry.op == OP_BVC || entry.op == OP_BVS);
 
-    if (is_branch) {
-        cpu->cycle += entry.cycles; // 基本周期
-        if (entry.op_func) entry.op_func(cpu, entry.addr_mode);
-        // 分支操作函数负责在分支被采纳时增加额外的周期（包括跨页）
-    } else {
+    cpu->cycles_left = entry.cycles; // 基本周期
+    if (!is_branch) {
         // 对非分支指令，根据寻址跨页加1周期（若寻址返回 1）
-        cpu->cycle += entry.cycles + page;
-        if (entry.op_func) entry.op_func(cpu, entry.addr_mode);
+        cpu->cycles_left += page;
+    }
+    if (entry.op_func) {
+        entry.op_func(cpu, entry.addr_mode);
     }
     cpu->page_crossed = 0;
 }
@@ -130,7 +126,22 @@ void cpu_init(CPU *cpu) {
     cpu->S = 0xFD;    // 初始化堆栈指针
     cpu->PC = 0;
     cpu->cycle = 0;
+    cpu->cycles_left = 0;
     cpu->nmi_pending = false;
     cpu->irq_pending = false;
     reset(cpu);
+}
+
+void cpu_clock(CPU *cpu) {
+    if (cpu->cycles_left == 0) {
+        check_interrupts(cpu);
+        if (cpu->cycles_left == 0) {
+            cpu_run(cpu);
+        }
+    }
+
+    if (cpu->cycles_left > 0) {
+        cpu->cycles_left--;
+    }
+    cpu->cycle++;
 }

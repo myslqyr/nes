@@ -121,6 +121,7 @@ typedef struct {
 
 extern PPU *ppu;
 void ppu_init(PPU *ppu);
+void ppu_clock(PPU *ppu);
 
 
 #endif

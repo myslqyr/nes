@@ -5,6 +5,7 @@
 #include "../include/cartridge.h"
 #include "../include/disassembly.h"
 #include "../include/ppu.h"
+#include "../include/bus.h"
 #include "../include/sdl.h"
 #include <string.h>
 
@@ -41,7 +42,7 @@ int main() {
         if (sdl_poll_quit()) {
             break;
         }
-        cpu_run(cpu);
+        bus_clock(cpu, ppu);
     }
     sdl_shutdown();
     debug_log_close();

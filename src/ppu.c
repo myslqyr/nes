@@ -261,11 +261,26 @@ u32 GetColourFromPalette (u8 palette, u8 pixel) {
     return NES_PALETTE_RGBA[ppu_read(0x3F00 + (palette << 2) +pixel)];
 }
 
-void ppu_clock(PPU *ppu) { 
-    if(ppu->scanline == 241 && ppu->cycle == 1) {
+void ppu_clock(PPU *ppu) {
+    if (ppu->scanline == 241 && ppu->cycle == 1) {
         ppu->status.vertical_blank = 1;
-        if(ppu->control.enable_nmi) {
+        if (ppu->control.enable_nmi) {
             ppu->nmi = true;
+        }
+    }
+
+    if (ppu->scanline == 261 && ppu->cycle == 1) {
+        ppu->status.vertical_blank = 0;
+        ppu->nmi = false;
+    }
+
+    ppu->cycle++;
+    if (ppu->cycle >= 341) {
+        ppu->cycle = 0;
+        ppu->scanline++;
+        if (ppu->scanline >= 262) {
+            ppu->scanline = 0;
+            ppu->frame++;
         }
     }
 }

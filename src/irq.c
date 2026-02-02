@@ -8,7 +8,7 @@ void reset(CPU *cpu) {
     u8 lo = cpu_read(RESET_VECTOR);
     u8 hi = cpu_read(RESET_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
-    //cpu->PC = 0xC000;
+    cpu->PC = 0xC000;
     
     // 初始化寄存器
     cpu->A = 0;
@@ -25,7 +25,7 @@ void reset(CPU *cpu) {
     
     // 复位需要7个时钟周期
     cpu->cycle = 0;
-    cpu->cycle += 7;
+    cpu->cycles_left = 7;
 }
 
 void irq(CPU *cpu) {
@@ -50,7 +50,7 @@ void irq(CPU *cpu) {
     cpu->PC = (hi << 8) | lo;
     
     // IRQ需要7个时钟周期
-    cpu->cycle += 7;
+    cpu->cycles_left += 7;
 }
 
 void nmi(CPU *cpu) {
@@ -71,7 +71,7 @@ void nmi(CPU *cpu) {
     cpu->PC = (hi << 8) | lo;
     
     // NMI需要7个时钟周期
-    cpu->cycle += 7;
+    cpu->cycles_left += 7;
 }
 
 // 在每个时钟周期检查中断

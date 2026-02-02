@@ -38,3 +38,13 @@ u8 cpu_read(u16 addr) {
     }
     return data;
 }
+
+
+void bus_clock(CPU *cpu,PPU *ppu) {
+    static u64 system_clock = 0;
+    ppu_clock(ppu);
+    if (system_clock % 3 == 0) {
+        cpu_clock(cpu);
+    }
+    system_clock++;
+}

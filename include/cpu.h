@@ -4,7 +4,7 @@
 #include "type.h"
 #include <stdbool.h>
 
-/* cpu内存分布
+/* cpu-内存分布
 $0000-$07FF  2KB RAM
 $0800-$1FFF  RAM镜像
 $2000-$2007  PPU寄存器
@@ -37,7 +37,8 @@ typedef struct {
     u8 X, Y; // 索引寄存器
     u8 S;    // 堆栈指针
     u16 PC;  // 程序计数器
-    u32 cycle; // 时钟周期
+    u32 cycle; // 总时钟周期
+    u8 cycles_left; // 当前指令剩余周期
     
     // 中断相关标志
     bool nmi_pending;   // NMI不可屏蔽中断等待处理
@@ -161,6 +162,7 @@ u8 fetch(CPU *cpu);     //取指
 OpInfo get_op(CPU *cpu);
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 void cpu_run(CPU *cpu);
+void cpu_clock(CPU *cpu);
 
 extern u8 cpuRam[0x0800]; // 2KB cpuRAM
 
