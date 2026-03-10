@@ -25,7 +25,7 @@ int main() {
 
     char input[100];
     //scanf("%s", input);
-    strcpy(input, "/home/myslqyr/czh/NES/rom/nestest.nes");
+    strcpy(input, "/home/myslqyr/czh/NES/rom/mario.nes");
     bool ret = cartridge_load(input);
     if(!ret) {
         printf("failed to load rom: %s\n", input);

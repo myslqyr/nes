@@ -8,7 +8,7 @@ void reset(CPU *cpu) {
     u8 lo = cpu_read(RESET_VECTOR);
     u8 hi = cpu_read(RESET_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
-    cpu->PC = 0xC000;
+    //cpu->PC = 0xC000;
     
     // 初始化寄存器
     cpu->A = 0;

@@ -4,17 +4,7 @@
 #include "type.h"
 #include <stdbool.h>
 
-u8 ppu_read(u16 addr);
-void ppu_write(u16 addr, u8 data);//与ppu总线通信
-
-u8 ppu_cpu_read(u16 addr, bool rdonly);
-void ppu_cpu_write(u16 addr, u8 data);//将ppu连接到cpu总线上,与总主线通信
-
-extern u8 tblName[2][1024]; // 名称表
-extern u8 tblPalette[32];   // 调色板
-//u8 tblPattern[2][4096]; // 模式表
-
-/*cpu-ppu寄存器*/
+/*cpu-ppu通信寄存器*/
 
 union PPUCTRL //0x2000
 	{
@@ -62,8 +52,6 @@ union PPUSTATUS //0x2002
 
 		u8 reg;
 	};
-
-
 
 
 
@@ -119,7 +107,12 @@ typedef struct {
     bool nmi;
 } PPU;
 
-extern PPU *ppu;
+u8 ppu_intern_read(u16 addr);
+void ppu_intern_write(u16 addr, u8 data);//与ppu内部总线通信
+
+u8 ppu_cpu_read(u16 addr, bool rdonly);
+void ppu_cpu_write(u16 addr, u8 data);//将ppu连接到cpu总线上,与总主线通信
+
 void ppu_init(PPU *ppu);
 void ppu_clock(PPU *ppu);
 
