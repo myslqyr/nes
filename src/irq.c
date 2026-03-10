@@ -53,9 +53,8 @@ void irq(CPU *cpu) {
     cpu->cycles_left += 7;
 }
 
-void nmi(CPU *cpu) {
+void cpu_nmi(CPU *cpu) {
     // NMI不能被禁止
-    
     // 保存当前程序计数器和状态寄存器
     push_stack16(cpu, cpu->PC);
     push_stack(cpu, cpu->P & ~FLAG_B);  // B标志在中断时被清除
@@ -71,13 +70,13 @@ void nmi(CPU *cpu) {
     cpu->PC = (hi << 8) | lo;
     
     // NMI需要7个时钟周期
-    cpu->cycles_left += 7;
+    cpu->cycles_left += 8;
 }
 
 // 在每个时钟周期检查中断
 void check_interrupts(CPU *cpu) {
     if (cpu->nmi_pending) {
-        nmi(cpu);
+        cpu_nmi(cpu);
         cpu->nmi_pending = false;
     } else if (cpu->irq_pending && !(cpu->P & FLAG_I)) {
         irq(cpu);

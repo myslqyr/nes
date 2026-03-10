@@ -38,7 +38,7 @@ typedef struct {
     u8 S;    // 堆栈指针
     u16 PC;  // 程序计数器
     u32 cycle; // 总时钟周期
-    u8 cycles_left; // 当前指令剩余周期
+    u8 cycles_left; // 当前执行的指令的剩余周期
     
     // 中断相关标志
     bool nmi_pending;   // NMI不可屏蔽中断等待处理
@@ -149,7 +149,7 @@ OpInfo get_op_type(u8 instruction);
 void clock_tick();   //模拟时钟周期
 void reset(CPU *cpu);
 void irq(CPU *cpu);
-void nmi(CPU *cpu);
+void cpu_nmi(CPU *cpu);
 void check_interrupts(CPU *cpu);
 
 void push_stack(CPU *cpu, u8 value);

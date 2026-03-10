@@ -101,7 +101,7 @@ typedef struct {
     u8 oam[256];
 
     // -------- 输出 --------
-    u32 framebuffer[256 * 240];
+    u16 framebuffer[256 * 240];
 
     // -------- 中断 --------
     bool nmi;

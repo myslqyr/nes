@@ -5,7 +5,7 @@
 
 void reset(CPU *cpu);
 void irq(CPU *cpu);
-void nmi(CPU *cpu);
+void cpu_nmi(CPU *cpu);
 void check_interrupts(CPU *cpu);
 
 #endif
