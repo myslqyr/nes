@@ -6,70 +6,55 @@
 
 /*cpu-ppu通信寄存器*/
 
-union PPUCTRL //0x2000
-	{
-		struct
-		{
-			u8 nametable_x : 1;
-			u8 nametable_y : 1;
-			u8 increment_mode : 1;
-			u8 pattern_sprite : 1;
-			u8 pattern_background : 1;
-			u8 sprite_size : 1;
-			u8 slave_mode : 1; // unused
-			u8 enable_nmi : 1;
-		};
-
-		u8 reg;
-	};
-
-union PPUMASK  //0x2001
-	{
-		struct
-		{
-			u8 grayscale : 1;
-			u8 render_background_left : 1;
-			u8 render_sprites_left : 1;
-			u8 render_background : 1;
-			u8 render_sprites : 1;
-			u8 enhance_red : 1;
-			u8 enhance_green : 1;
-			u8 enhance_blue : 1;
-		};
-
-		u8 reg;
-	};
-
-union PPUSTATUS //0x2002
-	{
-		struct
-		{
-			u8 unused : 5;
-			u8 sprite_overflow : 1;
-			u8 sprite_zero_hit : 1;
-			u8 vertical_blank : 1;
-		};
-
-		u8 reg;
-	};
-
-
-
-union loopy_register
-{
-	struct
-	{
-
-		u16 coarse_x : 5;
-		u16 coarse_y : 5;
-		u16 nametable_x : 1;
-		u16 nametable_y : 1;
-		u16 fine_y : 3;
-		u16 unused : 1;
-	};
-
-	u16 reg;
+typedef union {
+struct {
+    u8 unused          : 5;
+    u8 sprite_overflow : 1;
+    u8 sprite_hit_zero : 1;
+    u8 vertical_blank  : 1;
 };
+    u8 reg;
+} status_register;
+
+typedef union {
+struct {
+    u8 grayscale                : 1;
+    u8 render_background_left   : 1;
+    u8 render_sprites_left      : 1;
+    u8 render_background        : 1;
+    u8 render_sprites           : 1;
+    u8 enhance_red              : 1;
+    u8 enhance_green            : 1;
+    u8 enhance_blue             : 1;
+};
+    u8 reg;
+} mask_regsiter;
+
+typedef union {
+struct {
+    u8 nametable_x          : 1;
+    u8 nametable_y          : 1;
+    u8 increment_mode       : 1;
+    u8 pattern_sprite       : 1;
+    u8 pattern_background   : 1;
+    u8 sprite_size          : 1;
+    u8 slave_mode           : 1; // unused
+    u8 enable_nmi           : 1;
+};
+    u8 reg;
+} control_register;
+
+typedef union  {
+struct {
+    u16 coarse_x            : 5;
+    u16 coarse_y            : 5;
+    u16 nametable_x         : 1;
+    u16 nametable_y         : 1;
+    u16 fine_y              : 3;
+    u16 unused              : 1;
+};
+    u16 reg;
+} loopy_address_register;
 
 typedef struct {
     // -------- 时序 --------
@@ -78,20 +63,20 @@ typedef struct {
     u64 frame;
 
     // -------- 寄存器 --------
-    union PPUCTRL control;   // $2000
-    union PPUMASK mask;   // $2001
-    union PPUSTATUS status; // $2002
+    control_register control;   // $2000
+    mask_regsiter mask;   // $2001
+    status_register status; // $2002
     u8 oam_addr;   // $2003
     u8 oam_data;   // $2004
     u8 scroll; // $2005 (写 latch)
     u8 PPUADDR;   // $2006 (写 latch)
     u8 PPUDATA;   // $2007
+	loopy_address_register vram_addr;
+	loopy_address_register tram_addr;
+
 
     // -------- 内部状态 --------
-    u16 vram_addr;   // 当前 VRAM 地址
-    u16 tram_addr;   // 临时地址
-    u8 fine_x;
-    u8 addr_latch;	//地址锁存器
+    u8 latch_address;	//地址锁存器
     u8 ppu_data_buffer; //PPU数据缓存
 	u16 ppu_addr;//保存编译好的内存地址
 
@@ -101,6 +86,7 @@ typedef struct {
     u8 oam[256];
 
     // -------- 输出 --------
+	u8 data_buffer;
     u16 framebuffer[256 * 240];
 
     // -------- 中断 --------
@@ -110,11 +96,11 @@ typedef struct {
 u8 ppu_intern_read(u16 addr);
 void ppu_intern_write(u16 addr, u8 data);//与ppu内部总线通信
 
-u8 ppu_cpu_read(u16 addr, bool rdonly);
+u8 ppu_cpu_read(u16 addr);
 void ppu_cpu_write(u16 addr, u8 data);//将ppu连接到cpu总线上,与总主线通信
 
-void ppu_init(PPU *ppu);
-void ppu_clock(PPU *ppu);
+void ppu_init();
+void ppu_clock();
 
 
 #endif

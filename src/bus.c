@@ -23,7 +23,7 @@ u8 cpu_read(u16 addr) {
         data = cpuRam[addr & 0x07FF]; // 2KB RAM镜像
     } else if(addr >= 0x2000 && addr <= 0x3FFF) {
         // PPU寄存器镜像
-        data = ppu_cpu_read(addr & 0x0007, false);
+        data = ppu_cpu_read(addr & 0x0007);
     } else if (addr >= 0x4000 && addr <= 0x4017) {
         
     } else if (addr >= 0x4018 && addr <= 0x401F) {
@@ -40,11 +40,11 @@ u8 cpu_read(u16 addr) {
 }
 
 
-void bus_clock(CPU *cpu,PPU *ppu) {
+void bus_clock() {
     static u64 system_clock = 0;
-    ppu_clock(ppu);
+    ppu_clock();
     if (system_clock % 3 == 0) {
-        cpu_clock(cpu);
+        cpu_clock();
     }
     system_clock++;
 }

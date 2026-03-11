@@ -141,7 +141,7 @@ extern OpInfo op_info[256];
 
 typedef void (*OpFunc)(CPU *cpu, AddrMode mode);
 
-void cpu_init(CPU *cpu);
+void cpu_init();
 void set_flag(CPU *cpu, u8 flag, bool value);
 bool get_flag(CPU *cpu, u8 flag);
 void init_op_table();
@@ -162,7 +162,7 @@ u8 fetch(CPU *cpu);     //取指
 OpInfo get_op(CPU *cpu);
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 void cpu_run(CPU *cpu);
-void cpu_clock(CPU *cpu);
+void cpu_clock();
 
 extern u8 cpuRam[0x0800]; // 2KB cpuRAM
 

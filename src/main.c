@@ -10,14 +10,6 @@
 #include <string.h>
 
 int main() {
-    CPU *cpu = (CPU *)malloc(sizeof(CPU));
-    PPU *ppu = (PPU *)malloc(sizeof(PPU));
-
-    if (cpu == NULL || ppu == NULL) {
-        printf("Failed to allocate memory for CPU or PPU\n");
-        return 1;
-    }
-
     init_op_table();
     debug_log_init();
 
@@ -33,8 +25,8 @@ int main() {
     }
 
     // 在ROM加载后初始化CPU，这样reset()才能读取正确的向量
-    cpu_init(cpu);
-    ppu_init(ppu);
+    cpu_init();
+    ppu_init();
     sdl_init();
     printf("开始运行游戏...\n");
     printf("按Ctrl+C停止\n\n");
@@ -42,10 +34,9 @@ int main() {
         if (sdl_poll_quit()) {
             break;
         }
-        bus_clock(cpu, ppu);
+        bus_clock();
     }
     sdl_shutdown();
     debug_log_close();
-    free(cpu);  // 清理内存
     return 0;
 }

@@ -2,9 +2,11 @@
 #include "../include/irq.h"
 #include "../include/bus.h"
 #include "../include/disassembly.h"
+#include <stdlib.h>
 
 OpInfo op_info[256];
 u8 cpuRam[0x0800] = {0}; // 2KB cpuRAM
+CPU *cpu;
 
 
 // 堆栈操作辅助函数,堆栈固定在第一个页中
@@ -118,7 +120,8 @@ void cpu_run(CPU *cpu) {
 }
 
 /*初始化cpu*/
-void cpu_init(CPU *cpu) {
+void cpu_init() {
+    cpu = (CPU *)malloc(sizeof(CPU));
     cpu->P = FLAG_U;  // 未使用位总是1
     cpu->A = 0;
     cpu->X = 0;
@@ -132,7 +135,7 @@ void cpu_init(CPU *cpu) {
     reset(cpu);
 }
 
-void cpu_clock(CPU *cpu) {
+void cpu_clock() {
     if (cpu->cycles_left == 0) {
         check_interrupts(cpu);
         if (cpu->cycles_left == 0) {
