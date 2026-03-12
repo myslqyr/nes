@@ -46,5 +46,8 @@ void bus_clock() {
     if (system_clock % 3 == 0) {
         cpu_clock();
     }
+    if(ppu_nmi_triggered()) {
+        cpu_set_nmi();
+    }
     system_clock++;
 }

@@ -5,6 +5,9 @@
 #include <stdlib.h>
 
 PPU *ppu;
+u8   cart_ppu_read(u16 addr) { return 0x00; }
+void cart_ppu_write(u16 addr, u8 data) { }
+static u16 mirror_vram_addr(u16 addr) { return addr & 0x07FF; }
 
 enum cpu_ppu_io //cpu与ppu的总线通信寄存器
 {
@@ -17,6 +20,31 @@ enum cpu_ppu_io //cpu与ppu的总线通信寄存器
     PPU_ADDR       = 0x0006,
     PPU_DATA       = 0x0007,
     PPU_IO_END
+};
+
+enum ppu_address_space
+{
+    PATTERN_TABLE_0_BOUND       =   0x1000,
+    PATTERN_TABLE_1_BOUND       =   0x2000,
+    NAME_TABLE_0_BOUND          =   0x23C0,
+    ATTRIB_TABLE_0_BOUND        =   0x2400,
+    NAME_TABLE_1_BOUND          =   0x27C0,
+    ATTRIB_TABLE_1_BOUND        =   0x2800,
+    NAME_TABLE_2_BOUND          =   0x2BC0,
+    ATTRIB_TABLE_2_BOUND        =   0x2C00,
+    NAME_TABLE_3_BOUND          =   0x2FC0,
+    ATTRIB_TABLE_3_BOUND        =   0x3000,
+    UNUSED_BOUND                =   0x3F00,
+    PAL_RAM_BOUND               =   0x3F20,
+    PAL_RAM_MIRROR_BOUND        =   0x4000,
+};
+
+enum ppu_io_device
+{
+    UNKOWN,
+    CART,
+    VRAM,       // video ram, including data of name-table and attribe-table
+    PRAM,       // palatte ram, including data of palatte
 };
 
 
@@ -59,10 +87,46 @@ void ppu_init(void) {
 
     // 7. 初始化中断标志
     ppu->nmi = false;
+    ppu->frame_complete = false;
 }
 
-u8 ppu_intern_read(u16 addr) {
+static int ppu_memory_map (u16 addr) {
+    if (addr < UNUSED_BOUND)                return CART;      
+    else if (addr < PATTERN_TABLE_1_BOUND)  return CART;
+    else if (addr < ATTRIB_TABLE_3_BOUND)   return VRAM;
+    else if (addr < UNUSED_BOUND)           return UNKOWN;
+    else                                    return PRAM;
+}
 
+static u8 ppu_read_vram(u16 addr)
+{
+    return ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
+}
+static u8 ppu_read_pram(u16 addr)
+{
+    return 0x00;
+}
+
+static void ppu_write_vram(u16 addr, u8 data)
+{
+    ppu->vram[mirror_vram_addr(addr & 0x0FFF)] = data;
+}
+static void ppu_write_pram(u16 addr, u8 data)
+{
+
+}
+
+
+u8 ppu_intern_read(u16 addr) {
+    switch (ppu_memory_map(addr))
+    {
+    case CART: return cart_ppu_read(addr);
+    case VRAM: return ppu_read_vram(addr);
+    case PRAM: return ppu_read_pram(addr);
+        break;
+    default:
+        break;
+    }
 }
 void ppu_intern_write(u16 addr, u8 data) {
 
@@ -143,4 +207,48 @@ void ppu_cpu_write(u16 addr, u8 data) {
         break;
     }
 
+}
+
+bool ppu_nmi_triggered() {
+    if(ppu->nmi) {
+        ppu->nmi = false;
+        return true;
+    }
+    return false;
+}
+u16* ppu_frame_buffer()
+{
+    if (ppu->frame_complete) {
+        ppu->frame_complete = false;
+        return ppu->frame_buffer;
+    }
+    return NULL;
+}
+void ppu_clock() { 
+     if (ppu->scanline == 241 && ppu->cycle == 1) {
+        ppu->status.vertical_blank = 1;
+        if (ppu->control.enable_nmi)
+            ppu->nmi = true;
+    }
+    ppu->cycle++;
+    if (ppu->cycle == 341) {
+        ppu->cycle = 0;
+        ppu->scanline++;
+        if (ppu->scanline == 262) {
+            ppu->scanline = 0;
+        } else if (ppu->scanline == 261) {
+            goto LAST_CYCLE_OF_FRAME;
+        }
+    }
+    return;
+LAST_CYCLE_OF_FRAME:
+    if(ppu->mask.render_background) {
+        for(int i = 0;i < 240;i++) {
+            for(int j = 0;j < 256;j++) {
+                // 使用简单的测试颜色（红色渐变）
+                ppu->frame_buffer[i * 256 + j] = 0x1234;
+            }
+        }
+        ppu->frame_complete = true;
+    }
 }

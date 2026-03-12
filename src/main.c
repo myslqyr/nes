@@ -17,7 +17,7 @@ int main() {
 
     char input[100];
     //scanf("%s", input);
-    strcpy(input, "/home/myslqyr/czh/NES/rom/mario.nes");
+    strcpy(input, "/home/myslqyr/czh/NES/rom/donkeykong.nes");
     bool ret = cartridge_load(input);
     if(!ret) {
         printf("failed to load rom: %s\n", input);
@@ -29,12 +29,13 @@ int main() {
     ppu_init();
     sdl_init();
     printf("开始运行游戏...\n");
-    printf("按Ctrl+C停止\n\n");
+    printf("按 Ctrl+C 停止\n\n");
     while(1) {
         if (sdl_poll_quit()) {
             break;
         }
         bus_clock();
+        sdl_render_frame();  // 添加：每帧渲染 PPU 输出到 SDL 窗口
     }
     sdl_shutdown();
     debug_log_close();

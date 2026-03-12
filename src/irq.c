@@ -73,6 +73,7 @@ void cpu_nmi(CPU *cpu) {
     cpu->cycles_left += 8;
 }
 
+
 // 在每个时钟周期检查中断
 void check_interrupts(CPU *cpu) {
     if (cpu->nmi_pending) {

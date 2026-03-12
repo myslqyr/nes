@@ -163,6 +163,7 @@ OpInfo get_op(CPU *cpu);
 void run_instruction(CPU *cpu, OpType op, u16 addr, u8 num);//执行
 void cpu_run(CPU *cpu);
 void cpu_clock();
+void cpu_set_nmi();
 
 extern u8 cpuRam[0x0800]; // 2KB cpuRAM
 

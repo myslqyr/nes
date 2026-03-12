@@ -87,10 +87,11 @@ typedef struct {
 
     // -------- 输出 --------
 	u8 data_buffer;
-    u16 framebuffer[256 * 240];
+    u16 frame_buffer[256 * 240];
 
     // -------- 中断 --------
     bool nmi;
+    bool frame_complete;
 } PPU;
 
 u8 ppu_intern_read(u16 addr);
@@ -101,6 +102,8 @@ void ppu_cpu_write(u16 addr, u8 data);//将ppu连接到cpu总线上,与总主线
 
 void ppu_init();
 void ppu_clock();
+bool ppu_nmi_triggered();
+u16 *ppu_frame_buffer();
 
 
 #endif

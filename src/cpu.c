@@ -148,3 +148,8 @@ void cpu_clock() {
     }
     cpu->cycle++;
 }
+
+
+void cpu_set_nmi() {
+    cpu->nmi_pending = true;
+}

@@ -7,5 +7,6 @@
 void sdl_init();
 bool sdl_poll_quit();
 void sdl_shutdown();
+void sdl_render_frame();
 
 #endif // SDL_H
