@@ -1,10 +1,13 @@
 #include "../include/type.h"
 #include "../include/ppu.h"
 #include "../include/cartridge.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 PPU *ppu;
+
+bool cart_ppu_mapped_addr(u16 addr) { return false; }
 u8   cart_ppu_read(u16 addr) { return 0x00; }
 void cart_ppu_write(u16 addr, u8 data) { }
 static u16 mirror_vram_addr(u16 addr) { return addr & 0x07FF; }
@@ -91,7 +94,18 @@ void ppu_init(void) {
 }
 
 static int ppu_memory_map (u16 addr) {
-    if (addr < UNUSED_BOUND)                return CART;      
+    if ((addr < UNUSED_BOUND) && (cart_ppu_mapped_addr(addr)))                return CART;      
+    else if (addr < PATTERN_TABLE_1_BOUND)  return CART;
+    else if (addr < ATTRIB_TABLE_3_BOUND)   return VRAM;
+    else if (addr < UNUSED_BOUND)           return UNKOWN;
+    else                                    return PRAM;
+}
+
+static int ppu_bus_memory_map(u16 addr)
+{
+    if (addr < UNUSED_BOUND && cart_ppu_mapped_addr(addr))           
+        return CART;
+
     else if (addr < PATTERN_TABLE_1_BOUND)  return CART;
     else if (addr < ATTRIB_TABLE_3_BOUND)   return VRAM;
     else if (addr < UNUSED_BOUND)           return UNKOWN;
@@ -125,11 +139,19 @@ u8 ppu_intern_read(u16 addr) {
     case PRAM: return ppu_read_pram(addr);
         break;
     default:
+        return -1;
         break;
     }
 }
 void ppu_intern_write(u16 addr, u8 data) {
-
+    switch (ppu_bus_memory_map(addr))
+    {
+    case CART: cart_ppu_write(addr, data); return;
+    case VRAM: ppu_write_vram(addr, data); return;
+    case PRAM: ppu_write_pram(addr, data); return;
+    default:
+        break;
+    }
 }
 
 
@@ -245,8 +267,9 @@ LAST_CYCLE_OF_FRAME:
     if(ppu->mask.render_background) {
         for(int i = 0;i < 240;i++) {
             for(int j = 0;j < 256;j++) {
-                // 使用简单的测试颜色（红色渐变）
-                ppu->frame_buffer[i * 256 + j] = 0x1234;
+                u8 name = (ppu_intern_read(0x2000 | (((i >> 3) << 5) | (j >> 3))));
+                //printf("name:%d\n",name);
+                //ppu->frame_buffer[i * 256 + j] = 0x2567;
             }
         }
         ppu->frame_complete = true;

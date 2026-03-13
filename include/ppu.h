@@ -46,11 +46,11 @@ struct {
 
 typedef union  {
 struct {
-    u16 coarse_x            : 5;
-    u16 coarse_y            : 5;
-    u16 nametable_x         : 1;
+    u16 coarse_x            : 5;        //tile列索引
+    u16 coarse_y            : 5;        //tile行索引
+    u16 nametable_x         : 1;        //选择某一个命名表
     u16 nametable_y         : 1;
-    u16 fine_y              : 3;
+    u16 fine_y              : 3;        //一个tile的内部行号，tile为8*8的像素
     u16 unused              : 1;
 };
     u16 reg;
