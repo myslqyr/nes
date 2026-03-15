@@ -146,7 +146,6 @@ void set_flag(CPU *cpu, u8 flag, bool value);
 bool get_flag(CPU *cpu, u8 flag);
 void init_op_table();
 OpInfo get_op_type(u8 instruction);
-void clock_tick();   //模拟时钟周期
 void reset(CPU *cpu);
 void irq(CPU *cpu);
 void cpu_nmi(CPU *cpu);
@@ -156,6 +155,7 @@ void push_stack(CPU *cpu, u8 value);
 void push_stack16(CPU *cpu, u16 value);
 u8 pull_stack(CPU *cpu);
 u16 pull_stack16(CPU *cpu);
+u8 fetch_opnum(CPU *cpu);
 
 
 u8 fetch(CPU *cpu);     //取指  

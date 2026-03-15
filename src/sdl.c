@@ -34,8 +34,8 @@ void sdl_init() {
     }
     printf("[SDL Info] Renderer created successfully\n");
     
-    // 4. 创建纹理用于显示帧缓冲 (256x240, RGB888 格式)
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, 256, 240);
+    // 4. 创建纹理用于显示帧缓冲 (256x240, RGB565 格式)
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, 256, 240);
     if (!texture) {
         printf("[SDL Error] SDL_CreateTexture failed: %s\n", SDL_GetError());
         SDL_DestroyRenderer(renderer);
@@ -64,19 +64,9 @@ void sdl_render_frame() {
         return; // 没有新帧，跳过渲染
     }
     
-    // 将 RGB565 帧缓冲转换为 RGB888 像素数据
-    u32 pixels[256 * 240];
-    for (int i = 0; i < 256 * 240; i++) {
-        u16 color = frame[i];
-        // RGB565 格式转换：R(5bit) G(6bit) B(5bit) -> RGB888
-        u8 r = ((color >> 11) & 0x1F) << 3;  // 5bit -> 8bit
-        u8 g = ((color >> 5) & 0x3F) << 2;   // 6bit -> 8bit
-        u8 b = (color & 0x1F) << 3;          // 5bit -> 8bit
-        pixels[i] = (r << 16) | (g << 8) | b;
-    }
-    
+    // 直接使用 RGB565 帧缓冲数据（无需转换）
     // 更新纹理
-    SDL_UpdateTexture(texture, NULL, pixels, 256 * sizeof(u32));
+    SDL_UpdateTexture(texture, NULL, frame, 256 * sizeof(u16));
     // 清空渲染器
     SDL_RenderClear(renderer);
     // 复制纹理到渲染器

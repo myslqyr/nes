@@ -61,6 +61,10 @@ u8 fetch(CPU *cpu) {
     return cpu_read(cpu->PC++);
 }
 
+u8 fetch_opnum(CPU *cpu) {
+    return cpu_read(cpu->operand_addr);
+}
+
 
 /*获取二进制指令的操作码*/
 OpInfo get_op(CPU *cpu) {
@@ -118,6 +122,8 @@ void cpu_run(CPU *cpu) {
     }
     cpu->page_crossed = 0;
 }
+
+
 
 /*初始化cpu*/
 void cpu_init() {

@@ -2,6 +2,8 @@
  * opcodes.c
  * 把指令实现与寻址从 cpu 核心拆出，集中管理 opcode 表与函数指针映射
  */
+//todo:检查所有指令是否要调用cpu->fetched = cpu_read(cpu->PC++);
+//LDA等需要取数的指令单独设计一个fetch函数，在指令实现内部调用，不能在寻址逻辑里调用
 
 #include "../include/cpu.h"
 #include "../include/bus.h"
@@ -17,7 +19,7 @@ void set_zn_flags(CPU *cpu, u8 v) {
 /* 寻址函数 */
 u8 addr_impl(CPU *cpu) {
     cpu->operand_addr = 0;
-    cpu->fetched = 0;
+    //cpu->fetched = 0;
     return 0;
 }
 
@@ -28,8 +30,8 @@ u8 addr_acc(CPU *cpu) {
 }
 
 u8 addr_imm(CPU *cpu) {
-    cpu->operand_addr = cpu->PC;
-    cpu->fetched = cpu_read(cpu->PC++);
+    cpu->operand_addr = cpu->PC++;
+    //cpu->fetched = cpu_read(cpu->PC++);
     return 0;
 }
 
@@ -38,7 +40,7 @@ u8 addr_abs(CPU *cpu) {
     u8 hi = cpu_read(cpu->PC++);
     u16 addr = (hi << 8) | lo;
     cpu->operand_addr = addr;
-    cpu->fetched = cpu_read(addr);
+    //cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
@@ -49,7 +51,7 @@ u8 addr_abx(CPU *cpu) {
     u16 abs = (hi << 8) | lo;
     u16 final = abs + cpu->X;
     cpu->operand_addr = final;
-    cpu->fetched = cpu_read(final);
+    //cpu->fetched = cpu_read(final);
     cpu->page_crossed = ((final & 0xFF00) != (abs & 0xFF00)) ? 1 : 0;
     return cpu->page_crossed;
 }
@@ -60,7 +62,7 @@ u8 addr_aby(CPU *cpu) {
     u16 abs = (hi << 8) | lo;
     u16 final = abs + cpu->Y;
     cpu->operand_addr = final;
-    cpu->fetched = cpu_read(final);
+    //cpu->fetched = cpu_read(final);
     cpu->page_crossed = ((final & 0xFF00) != (abs & 0xFF00)) ? 1 : 0;
     return cpu->page_crossed;
 }
@@ -68,7 +70,7 @@ u8 addr_aby(CPU *cpu) {
 u8 addr_zp(CPU *cpu) {
     u8 a = cpu_read(cpu->PC++);
     cpu->operand_addr = a & 0xFF;
-    cpu->fetched = cpu_read(cpu->operand_addr);
+    //cpu->fetched = cpu_read(cpu->operand_addr);
     cpu->page_crossed = 0;
     return 0;
 }
@@ -77,7 +79,7 @@ u8 addr_zpx(CPU *cpu) {
     u8 base = cpu_read(cpu->PC++);
     u8 addr = (base + cpu->X) & 0xFF;
     cpu->operand_addr = addr;
-    cpu->fetched = cpu_read(addr);
+    //cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
@@ -86,7 +88,7 @@ u8 addr_zpy(CPU *cpu) {
     u8 base = cpu_read(cpu->PC++);
     u8 addr = (base + cpu->Y) & 0xFF;
     cpu->operand_addr = addr;
-    cpu->fetched = cpu_read(addr);
+   // cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
@@ -99,7 +101,7 @@ u8 addr_ind(CPU *cpu) {
     u8 nhi = ((ptr & 0x00FF) == 0x00FF) ? cpu_read(ptr & 0xFF00) : cpu_read(ptr + 1);
     u16 addr = (nhi << 8) | nlo;
     cpu->operand_addr = addr;
-    cpu->fetched = cpu_read(addr);
+    //cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
@@ -111,7 +113,7 @@ u8 addr_indx(CPU *cpu) {
     u8 hi = cpu_read((ptr + 1) & 0xFF);
     u16 addr = (hi << 8) | lo;
     cpu->operand_addr = addr;
-    cpu->fetched = cpu_read(addr);
+    //cpu->fetched = cpu_read(addr);
     cpu->page_crossed = 0;
     return 0;
 }
@@ -123,7 +125,7 @@ u8 addr_indy(CPU *cpu) {
     u16 base = (hi << 8) | lo;
     u16 final = base + cpu->Y;
     cpu->operand_addr = final;
-    cpu->fetched = cpu_read(final);
+    //cpu->fetched = cpu_read(final);
     cpu->page_crossed = ((final & 0xFF00) != (base & 0xFF00)) ? 1 : 0;
     return cpu->page_crossed;
 }
@@ -138,7 +140,7 @@ u8 addr_rel(CPU *cpu) { //相对寻址
     }
     cpu->operand_addr = base_pc;
     cpu->page_crossed = ((base_pc & 0xFF00) != (cpu->PC & 0xFF00)) ? 1 : 0;
-    cpu->fetched = 0;
+    //cpu->fetched = 0;
     return cpu->page_crossed;
 }
 
@@ -155,6 +157,7 @@ void op_nop(CPU *cpu, AddrMode mode) {
 
 void op_lda(CPU *cpu, AddrMode mode) {
     (void)mode;  // 不使用mode参数，因为LDA总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     cpu->A = cpu->fetched;
     set_zn_flags(cpu, cpu->A);
 }
@@ -166,6 +169,7 @@ void op_sta(CPU *cpu, AddrMode mode) {
 
 void op_adc(CPU *cpu, AddrMode mode) {
     (void)mode;  // ADC总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     u8 m = cpu->fetched;
     u8 carry = get_flag(cpu, FLAG_C) ? 1 : 0;
     u16 res = (u16)cpu->A + (u16)m + carry;
@@ -178,6 +182,7 @@ void op_adc(CPU *cpu, AddrMode mode) {
 
 void op_sbc(CPU *cpu, AddrMode mode) {
     (void)mode;  // SBC总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     u8 m = cpu->fetched;
     u8 carry = get_flag(cpu, FLAG_C) ? 1 : 0;
     u16 value = m ^ 0xFF;
@@ -248,18 +253,21 @@ void op_dey(CPU *cpu, AddrMode mode) {
 
 void op_and(CPU *cpu, AddrMode mode) {
     (void)mode;  // AND总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     cpu->A &= cpu->fetched;
     set_zn_flags(cpu, cpu->A);
 }
 
 void op_ora(CPU *cpu, AddrMode mode) {
     (void)mode;  // ORA总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     cpu->A |= cpu->fetched;
     set_zn_flags(cpu, cpu->A);
 }
 
 void op_eor(CPU *cpu, AddrMode mode) {
     (void)mode;  // EOR总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     cpu->A ^= cpu->fetched;
     set_zn_flags(cpu, cpu->A);
 }
@@ -480,12 +488,14 @@ void op_rti(CPU *cpu, AddrMode mode) {
 /* 更多的操作函数 */
 void op_ldx(CPU *cpu, AddrMode mode) {
     (void)mode;  // LDX总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     cpu->X = cpu->fetched;
     set_zn_flags(cpu, cpu->X);
 }
 
 void op_ldy(CPU *cpu, AddrMode mode) {
     (void)mode;  // LDY总是使用fetched值
+    cpu->fetched = fetch_opnum(cpu);
     cpu->Y = cpu->fetched;
     set_zn_flags(cpu, cpu->Y);
 }

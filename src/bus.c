@@ -2,6 +2,7 @@
 #include "../include/cpu.h"
 #include "../include/cartridge.h"
 #include "../include/ppu.h"
+#include <stdio.h>
 
 /* 
     void cpu_write(u16 addr, u8 data);
@@ -12,7 +13,11 @@ void cpu_write(u16 addr, u8 data) {
         cpuRam[addr & 0x07FF] = data; // 2KB RAM镜像
     } else if(addr >= 0x2000 && addr <= 0x3FFF) {
         // PPU寄存器镜像
-        ppu_cpu_write(addr & 0x0007, data);
+        if(addr == 0x2007) {
+            printf("[VRAM WRITE CPU->PPU instruction]: data=%3d to ins_addr=0x%04X\n",data, addr); 
+        }
+      
+        ppu_cpu_write(addr, data);
     }
 
 }

@@ -7,9 +7,15 @@
 
 PPU *ppu;
 
-bool cart_ppu_mapped_addr(u16 addr) { return false; }
-u8   cart_ppu_read(u16 addr) { return 0x00; }
-void cart_ppu_write(u16 addr, u8 data) { }
+bool cart_ppu_mapped_addr(u16 addr) { 
+    // 0x0000-0x1FFF 映射到卡带 CHR-ROM/CHR-RAM
+    return false;
+}
+u8   cart_ppu_read(u16 addr) { 
+    return 0x00;
+}
+void cart_ppu_write(u16 addr, u8 data) { 
+}
 static u16 mirror_vram_addr(u16 addr) { return addr & 0x07FF; }
 
 enum cpu_ppu_io //cpu与ppu的总线通信寄存器
@@ -78,12 +84,6 @@ void ppu_init(void) {
     ppu->latch_address = 0x00;      // 地址锁存
     ppu->ppu_addr = 0x0000;      // 编译好的内存地址
 
-
-    // 5. 初始化内存区域 (memset 已清零，此处仅为逻辑示意)
-    // ppu->vram[2048]    -> 已清零
-    // ppu->palette[32]   -> 已清零
-    // ppu->oam[256]      -> 已清零
-
     // 6. 初始化输出缓冲
     ppu->data_buffer = 0x00;
     // ppu->framebuffer[256 * 240] -> 已清零
@@ -114,7 +114,10 @@ static int ppu_bus_memory_map(u16 addr)
 
 static u8 ppu_read_vram(u16 addr)
 {
-    return ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
+    u8 temp = ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
+    printf("ppu_read_vram return:%d\n",temp);
+    return temp;
+    //return ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
 }
 static u8 ppu_read_pram(u16 addr)
 {
@@ -123,7 +126,10 @@ static u8 ppu_read_pram(u16 addr)
 
 static void ppu_write_vram(u16 addr, u8 data)
 {
-    ppu->vram[mirror_vram_addr(addr & 0x0FFF)] = data;
+    u16 offset = mirror_vram_addr(addr & 0x0FFF);
+    printf("[VRAM WRITE 2] addr=0x%04X, offset=%d, data=%3d\n", 
+           addr, offset, data);
+    ppu->vram[offset] = data;
 }
 static void ppu_write_pram(u16 addr, u8 data)
 {
@@ -135,7 +141,12 @@ u8 ppu_intern_read(u16 addr) {
     switch (ppu_memory_map(addr))
     {
     case CART: return cart_ppu_read(addr);
-    case VRAM: return ppu_read_vram(addr);
+    case VRAM: {
+        u8 temp = ppu_read_vram(addr);
+        printf("ppu_intern_read return:%d\n",temp);
+        return temp;
+    }
+        //return ppu_read_vram(addr);
     case PRAM: return ppu_read_pram(addr);
         break;
     default:
@@ -147,7 +158,8 @@ void ppu_intern_write(u16 addr, u8 data) {
     switch (ppu_bus_memory_map(addr))
     {
     case CART: cart_ppu_write(addr, data); return;
-    case VRAM: ppu_write_vram(addr, data); return;
+    case VRAM: {printf("[VRAM WRITE 1] addr=0x%04X, data=%3d\n", 
+           addr, data); ppu_write_vram(addr, data);  return;}
     case PRAM: ppu_write_pram(addr, data); return;
     default:
         break;
@@ -169,6 +181,8 @@ u8 ppu_cpu_read(u16 addr) {
         break;
     case PPU_DATA:
     {
+        printf("[VRAM WRITE READ CPU->PPU] Reading $2007: data=%3d to vram_addr=0x%04X\n", 
+               data, ppu->vram_addr.reg);
         data = ppu->data_buffer;
         ppu->data_buffer = ppu_intern_read(ppu->vram_addr.reg);
          if (ppu->vram_addr.reg >= 0x3F00) {
@@ -221,6 +235,8 @@ void ppu_cpu_write(u16 addr, u8 data) {
     }
     case PPU_DATA:
     {
+        printf("[VRAM WRITE CPU->PPU] Writing $2007: data=%3d to vram_addr=0x%04X\n", 
+               data, ppu->vram_addr.reg);
         ppu_intern_write(ppu->vram_addr.reg, data);
         ppu->vram_addr.reg += (ppu->control.increment_mode ? 32 : 1);
         break;
@@ -265,11 +281,21 @@ void ppu_clock() {
     return;
 LAST_CYCLE_OF_FRAME:
     if(ppu->mask.render_background) {
-        for(int i = 0;i < 240;i++) {
-            for(int j = 0;j < 256;j++) {
+        for(int i = 0; i < 240; i++) {
+            for(int j = 0; j < 256; j++) {
                 u8 name = (ppu_intern_read(0x2000 | (((i >> 3) << 5) | (j >> 3))));
-                //printf("name:%d\n",name);
-                //ppu->frame_buffer[i * 256 + j] = 0x2567;
+                printf("name:%d\n",name);
+                // 生成渐变测试图案
+                // u8 r = (j * 256 / 256) & 0xFF;  // 水平红色渐变
+                // u8 g = (i * 256 / 240) & 0xFF;  // 垂直绿色渐变
+                // u8 b = 128;                      // 固定蓝色
+                
+                // // 转换为 RGB565
+                // u8 r5 = (r >> 3) & 0x1F;
+                // u8 g5 = (g >> 2) & 0x3F;
+                // u8 b5 = (b >> 3) & 0x1F;
+                // ppu->frame_buffer[i * 256 + j] = (u16)((r5 << 11) | (g5 << 5) | b5);
+                ppu->frame_buffer[i * 256 + j] = (u16)(name);
             }
         }
         ppu->frame_complete = true;
