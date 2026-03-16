@@ -1,6 +1,7 @@
 #include "../include/type.h"
 #include "../include/ppu.h"
 #include "../include/cartridge.h"
+#include "../include/sdl.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -114,10 +115,7 @@ static int ppu_bus_memory_map(u16 addr)
 
 static u8 ppu_read_vram(u16 addr)
 {
-    u8 temp = ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
-    printf("ppu_read_vram return:%d\n",temp);
-    return temp;
-    //return ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
+    return ppu->vram[mirror_vram_addr(addr & 0x0FFF)];
 }
 static u8 ppu_read_pram(u16 addr)
 {
@@ -127,8 +125,6 @@ static u8 ppu_read_pram(u16 addr)
 static void ppu_write_vram(u16 addr, u8 data)
 {
     u16 offset = mirror_vram_addr(addr & 0x0FFF);
-    printf("[VRAM WRITE 2] addr=0x%04X, offset=%d, data=%3d\n", 
-           addr, offset, data);
     ppu->vram[offset] = data;
 }
 static void ppu_write_pram(u16 addr, u8 data)
@@ -143,7 +139,6 @@ u8 ppu_intern_read(u16 addr) {
     case CART: return cart_ppu_read(addr);
     case VRAM: {
         u8 temp = ppu_read_vram(addr);
-        printf("ppu_intern_read return:%d\n",temp);
         return temp;
     }
         //return ppu_read_vram(addr);
@@ -158,8 +153,7 @@ void ppu_intern_write(u16 addr, u8 data) {
     switch (ppu_bus_memory_map(addr))
     {
     case CART: cart_ppu_write(addr, data); return;
-    case VRAM: {printf("[VRAM WRITE 1] addr=0x%04X, data=%3d\n", 
-           addr, data); ppu_write_vram(addr, data);  return;}
+    case VRAM:  ppu_write_vram(addr, data);  return;
     case PRAM: ppu_write_pram(addr, data); return;
     default:
         break;
@@ -181,8 +175,6 @@ u8 ppu_cpu_read(u16 addr) {
         break;
     case PPU_DATA:
     {
-        printf("[VRAM WRITE READ CPU->PPU] Reading $2007: data=%3d to vram_addr=0x%04X\n", 
-               data, ppu->vram_addr.reg);
         data = ppu->data_buffer;
         ppu->data_buffer = ppu_intern_read(ppu->vram_addr.reg);
          if (ppu->vram_addr.reg >= 0x3F00) {
@@ -212,6 +204,7 @@ void ppu_cpu_write(u16 addr, u8 data) {
     }
     case PPU_MASK:
     {
+        if(stop()){printf("ppu mask:0x%x\n",data);}
         ppu->mask.reg = data;
         break;
     }
@@ -235,8 +228,6 @@ void ppu_cpu_write(u16 addr, u8 data) {
     }
     case PPU_DATA:
     {
-        printf("[VRAM WRITE CPU->PPU] Writing $2007: data=%3d to vram_addr=0x%04X\n", 
-               data, ppu->vram_addr.reg);
         ppu_intern_write(ppu->vram_addr.reg, data);
         ppu->vram_addr.reg += (ppu->control.increment_mode ? 32 : 1);
         break;
@@ -284,7 +275,6 @@ LAST_CYCLE_OF_FRAME:
         for(int i = 0; i < 240; i++) {
             for(int j = 0; j < 256; j++) {
                 u8 name = (ppu_intern_read(0x2000 | (((i >> 3) << 5) | (j >> 3))));
-                printf("name:%d\n",name);
                 // 生成渐变测试图案
                 // u8 r = (j * 256 / 256) & 0xFF;  // 水平红色渐变
                 // u8 g = (i * 256 / 240) & 0xFF;  // 垂直绿色渐变
@@ -295,7 +285,18 @@ LAST_CYCLE_OF_FRAME:
                 // u8 g5 = (g >> 2) & 0x3F;
                 // u8 b5 = (b >> 3) & 0x1F;
                 // ppu->frame_buffer[i * 256 + j] = (u16)((r5 << 11) | (g5 << 5) | b5);
-                ppu->frame_buffer[i * 256 + j] = (u16)(name);
+                //ppu->frame_buffer[i * 256 + j] = (u16)(name);
+                u8 r3 = (name >> 5) & 0x07;  // 高3位R（0~7）
+                    u8 g3 = (name >> 2) & 0x07;  // 中间3位G（0~7）
+                    u8 b2 = name & 0x03;         // 低2位B（0~3）
+                    
+                    // 扩展为RGB565各分量
+                    u8 r5 = (r3 << 2) | (r3 >> 1);  // 3位→5位：左移2位 + 填充最高位的1位（r3>>1取最高位）
+                    u8 g5 = (g3 << 3) | (g3);       // 3位→6位：左移3位 + 填充最高位的3位（g3本身重复）
+                    u8 b5 = (b2 << 3) | (b2 << 1) | (b2 >> 1);  // 2位→5位：左移3位 + 填充最高位的2位
+                    
+                    // 组合为16位RGB565（高5位R，中6位G，低5位B）
+                    ppu->frame_buffer[i * 256 + j] = (u16)((r5 << 11) | (g5 << 5) | b5);
             }
         }
         ppu->frame_complete = true;

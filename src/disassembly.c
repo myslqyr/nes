@@ -349,7 +349,7 @@ void debug_print_instruction(CPU *cpu, u8 opcode, OpInfo entry, u16 current_pc) 
     // 输出到控制台
     printf("%s", debug_line);
 
-    // 输出到日志文件
+    //输出到日志文件
     if (debug_log_file != NULL) {
         fprintf(debug_log_file, "%s", debug_line);
         fflush(debug_log_file); // 立即刷新到文件

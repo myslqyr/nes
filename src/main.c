@@ -9,6 +9,8 @@
 #include "../include/sdl.h"
 #include <string.h>
 
+
+
 int main() {
     init_op_table();
     debug_log_init();
@@ -36,6 +38,7 @@ int main() {
         }
         bus_clock();
         sdl_render_frame();  // 添加：每帧渲染 PPU 输出到 SDL 窗口
+        
     }
     sdl_shutdown();
     debug_log_close();

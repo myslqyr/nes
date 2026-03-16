@@ -5,27 +5,27 @@
 // 中断处理函数
 void reset(CPU *cpu) {
     // 读取复位向量，通电重置后会触发一个RESET中断，也就是会将CPU的指令指针寄存器PC(Program Counter)跳转到RESET中断存储的地址
-    u8 lo = cpu_read(RESET_VECTOR);
-    u8 hi = cpu_read(RESET_VECTOR + 1);
+    u16 lo = cpu_read(RESET_VECTOR);
+    u16 hi = cpu_read(RESET_VECTOR + 1);
     cpu->PC = (hi << 8) | lo;
     //cpu->PC = 0xC000;
     
     // 初始化寄存器
-    cpu->A = 0;
-    cpu->X = 0;
-    cpu->Y = 0;
-    cpu->S = 0xFD;
+    // cpu->A = 0;
+    // cpu->X = 0;
+    // cpu->Y = 0;
+    // cpu->S = 0xFD;
     
-    // 设置状态寄存器
-    cpu->P = FLAG_U | FLAG_I;  // 设置中断禁止和未使用标志
+    // // 设置状态寄存器
+    // cpu->P = FLAG_U | FLAG_I;  // 设置中断禁止和未使用标志
     
-    // 清除中断标志
-    cpu->nmi_pending = false;
-    cpu->irq_pending = false;
+    // // 清除中断标志
+    // cpu->nmi_pending = false;
+    // cpu->irq_pending = false;
     
-    // 复位需要7个时钟周期
-    cpu->cycle = 0;
-    cpu->cycles_left = 7;
+    // // 复位需要7个时钟周期
+    // cpu->cycle = 0;
+    // cpu->cycles_left = 7;
 }
 
 void irq(CPU *cpu) {

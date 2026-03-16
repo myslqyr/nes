@@ -4,6 +4,8 @@
 #include "../include/ppu.h"
 #include <stdio.h>
 
+static u64 system_clock = 0;
+
 /* 
     void cpu_write(u16 addr, u8 data);
     向内存指定区域写入
@@ -13,10 +15,6 @@ void cpu_write(u16 addr, u8 data) {
         cpuRam[addr & 0x07FF] = data; // 2KB RAM镜像
     } else if(addr >= 0x2000 && addr <= 0x3FFF) {
         // PPU寄存器镜像
-        if(addr == 0x2007) {
-            printf("[VRAM WRITE CPU->PPU instruction]: data=%3d to ins_addr=0x%04X\n",data, addr); 
-        }
-      
         ppu_cpu_write(addr, data);
     }
 
@@ -46,11 +44,10 @@ u8 cpu_read(u16 addr) {
 
 
 void bus_clock() {
-    static u64 system_clock = 0;
     ppu_clock();
-    if (system_clock % 3 == 0) {
+    //if (system_clock % 3 == 0) {
         cpu_clock();
-    }
+    //}
     if(ppu_nmi_triggered()) {
         cpu_set_nmi();
     }

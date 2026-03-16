@@ -6,7 +6,13 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static SDL_Texture *texture = NULL;
-
+static int frame_count = 0;
+bool stop() {
+    if(frame_count>=342) {
+        return true;
+    }
+    return false;
+}
 void sdl_init() {
     // 1. 初始化 SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -67,12 +73,13 @@ void sdl_render_frame() {
     // 直接使用 RGB565 帧缓冲数据（无需转换）
     // 更新纹理
     SDL_UpdateTexture(texture, NULL, frame, 256 * sizeof(u16));
-    // 清空渲染器
-    SDL_RenderClear(renderer);
     // 复制纹理到渲染器
     SDL_RenderCopy(renderer, texture, NULL, NULL);
     // 呈现
     SDL_RenderPresent(renderer);
+    printf("frame:%d\n",frame_count);
+    frame_count++;
+    stop();
 }
 
 void sdl_shutdown() {

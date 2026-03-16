@@ -1,0 +1,658 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ns/call  ns/call  name    
+ 50.00      0.02     0.02  1546678    12.93    12.93  ppu_frame_buffer
+ 25.00      0.03     0.01   800033    12.50    12.50  cartridge_cpu_read
+ 25.00      0.04     0.01   397840    25.14    50.27  cpu_run
+  0.00      0.04     0.00  1546679     0.00     0.00  sdl_poll_quit
+  0.00      0.04     0.00  1546678     0.00    12.93  bus_clock
+  0.00      0.04     0.00  1546678     0.00    12.93  cpu_clock
+  0.00      0.04     0.00  1546678     0.00     0.00  ppu_clock
+  0.00      0.04     0.00  1546678     0.00     0.00  ppu_nmi_triggered
+  0.00      0.04     0.00  1546678     0.00    12.93  sdl_render_frame
+  0.00      0.04     0.00   909493     0.00     0.00  cpu_read
+  0.00      0.04     0.00   800033     0.00     0.00  mapper0_cpu_map_read
+  0.00      0.04     0.00   397856     0.00     0.00  check_interrupts
+  0.00      0.04     0.00   221983     0.00    12.50  addr_zp
+  0.00      0.04     0.00   207737     0.00     0.00  cpu_write
+  0.00      0.04     0.00   146697     0.00     0.00  op_ror
+  0.00      0.04     0.00    48049     0.00    25.00  addr_abs
+  0.00      0.04     0.00    47907     0.00     0.25  op_lda
+  0.00      0.04     0.00    46896     0.00     0.00  addr_imm
+  0.00      0.04     0.00    45986     0.00    12.49  op_and
+  0.00      0.04     0.00    43276     0.00     0.00  addr_impl
+  0.00      0.04     0.00    32896     0.00    12.50  addr_rel
+  0.00      0.04     0.00    27741     0.00     0.00  op_beq
+  0.00      0.04     0.00    23297     0.00     0.00  op_sta
+  0.00      0.04     0.00    18497     0.00     0.00  op_jsr
+  0.00      0.04     0.00    18496     0.00     0.00  op_rts
+  0.00      0.04     0.00    18438     0.00     0.00  op_clc
+  0.00      0.04     0.00    18372     0.00     0.00  op_jmp
+  0.00      0.04     0.00    18370     0.00     0.02  op_eor
+  0.00      0.04     0.00     9203     0.00     0.00  ppu_cpu_read
+  0.00      0.04     0.00     4306     0.00     0.00  op_bne
+  0.00      0.04     0.00     3392     0.00     0.00  op_dey
+  0.00      0.04     0.00     3001     0.00    12.50  addr_indy
+  0.00      0.04     0.00     1620     0.00     0.00  ppu_cpu_write
+  0.00      0.04     0.00     1286     0.00     0.00  op_iny
+  0.00      0.04     0.00     1125     0.00     0.00  addr_acc
+  0.00      0.04     0.00      850     0.00     0.00  op_lsr
+  0.00      0.04     0.00      689     0.00     0.00  op_dex
+  0.00      0.04     0.00      382     0.00     0.00  op_bcs
+  0.00      0.04     0.00      345     0.00     3.22  op_ora
+  0.00      0.04     0.00      336     0.00    12.50  addr_zpx
+  0.00      0.04     0.00      336     0.00     0.00  op_pha
+  0.00      0.04     0.00      336     0.00     0.00  op_pla
+  0.00      0.04     0.00      311     0.00     0.00  op_bpl
+  0.00      0.04     0.00      265     0.00     0.00  op_rol
+  0.00      0.04     0.00      262     0.00    25.00  addr_abx
+  0.00      0.04     0.00      233     0.00     6.17  op_ldy
+  0.00      0.04     0.00      211     0.00     3.44  op_ldx
+  0.00      0.04     0.00      154     0.00     0.00  op_bcc
+  0.00      0.04     0.00      145     0.00     0.00  op_asl
+  0.00      0.04     0.00      115     0.00     0.11  op_adc
+  0.00      0.04     0.00      104     0.00     0.00  op_tya
+  0.00      0.04     0.00       96     0.00    10.42  op_sbc
+  0.00      0.04     0.00       87     0.00     0.00  op_dec
+  0.00      0.04     0.00       83     0.00     0.00  op_stx
+  0.00      0.04     0.00       60     0.00     0.00  op_tax
+  0.00      0.04     0.00       55     0.00     0.00  op_sec
+  0.00      0.04     0.00       52     0.00     0.00  op_cmp
+  0.00      0.04     0.00       39     0.00     0.00  op_sty
+  0.00      0.04     0.00       26     0.00     0.00  op_tay
+  0.00      0.04     0.00       21     0.00     0.00  op_inc
+  0.00      0.04     0.00       17     0.00     0.00  op_cld
+  0.00      0.04     0.00       16     0.00    25.00  addr_aby
+  0.00      0.04     0.00       16     0.00     0.00  cpu_set_nmi
+  0.00      0.04     0.00       16     0.00     0.00  op_inx
+  0.00      0.04     0.00       16     0.00     0.00  op_rti
+  0.00      0.04     0.00       16     0.00     0.00  push_stack
+  0.00      0.04     0.00       16     0.00     0.00  push_stack16
+  0.00      0.04     0.00        7     0.00     0.00  op_txa
+  0.00      0.04     0.00        2     0.00     0.00  op_bmi
+  0.00      0.04     0.00        1     0.00     0.00  cartridge_load
+  0.00      0.04     0.00        1     0.00     0.00  cpu_init
+  0.00      0.04     0.00        1     0.00     0.00  debug_log_close
+  0.00      0.04     0.00        1     0.00     0.00  debug_log_init
+  0.00      0.04     0.00        1     0.00     0.00  init_op_table
+  0.00      0.04     0.00        1     0.00     0.00  op_sei
+  0.00      0.04     0.00        1     0.00     0.00  op_txs
+  0.00      0.04     0.00        1     0.00     0.00  ppu_init
+  0.00      0.04     0.00        1     0.00    25.00  reset
+  0.00      0.04     0.00        1     0.00     0.00  sdl_init
+  0.00      0.04     0.00        1     0.00     0.00  sdl_shutdown
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 25.00% of 0.04 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]    100.0    0.00    0.04                 main [1]
+                0.00    0.02 1546678/1546678     sdl_render_frame [3]
+                0.00    0.02 1546678/1546678     bus_clock [4]
+                0.00    0.00       1/1           reset [23]
+                0.00    0.00 1546679/1546679     sdl_poll_quit [25]
+                0.00    0.00       1/1           init_op_table [76]
+                0.00    0.00       1/1           debug_log_init [75]
+                0.00    0.00       1/1           cartridge_load [72]
+                0.00    0.00       1/1           ppu_init [79]
+                0.00    0.00       1/1           cpu_init [73]
+                0.00    0.00       1/1           sdl_init [80]
+                0.00    0.00       1/1           sdl_shutdown [81]
+                0.00    0.00       1/1           debug_log_close [74]
+-----------------------------------------------
+                0.02    0.00 1546678/1546678     sdl_render_frame [3]
+[2]     50.0    0.02    0.00 1546678         ppu_frame_buffer [2]
+-----------------------------------------------
+                0.00    0.02 1546678/1546678     main [1]
+[3]     50.0    0.00    0.02 1546678         sdl_render_frame [3]
+                0.02    0.00 1546678/1546678     ppu_frame_buffer [2]
+-----------------------------------------------
+                0.00    0.02 1546678/1546678     main [1]
+[4]     50.0    0.00    0.02 1546678         bus_clock [4]
+                0.00    0.02 1546678/1546678     cpu_clock [5]
+                0.00    0.00 1546678/1546678     ppu_clock [26]
+                0.00    0.00 1546678/1546678     ppu_nmi_triggered [27]
+                0.00    0.00      16/16          cpu_set_nmi [65]
+-----------------------------------------------
+                0.00    0.02 1546678/1546678     bus_clock [4]
+[5]     50.0    0.00    0.02 1546678         cpu_clock [5]
+                0.01    0.01  397840/397840      cpu_run [6]
+                0.00    0.00  397856/397856      check_interrupts [21]
+-----------------------------------------------
+                0.01    0.01  397840/397840      cpu_clock [5]
+[6]     50.0    0.01    0.01  397840         cpu_run [6]
+                0.00    0.00  397840/800033      cartridge_cpu_read [7]
+                0.00    0.00  221983/221983      addr_zp [8]
+                0.00    0.00   48049/48049       addr_abs [9]
+                0.00    0.00   45986/45986       op_and [10]
+                0.00    0.00   32896/32896       addr_rel [11]
+                0.00    0.00    3001/3001        addr_indy [12]
+                0.00    0.00   47907/47907       op_lda [13]
+                0.00    0.00     262/262         addr_abx [14]
+                0.00    0.00     336/336         addr_zpx [15]
+                0.00    0.00     233/233         op_ldy [16]
+                0.00    0.00     345/345         op_ora [17]
+                0.00    0.00      96/96          op_sbc [18]
+                0.00    0.00     211/211         op_ldx [19]
+                0.00    0.00   18370/18370       op_eor [20]
+                0.00    0.00      16/16          addr_aby [22]
+                0.00    0.00     115/115         op_adc [24]
+                0.00    0.00  397840/909493      cpu_read [28]
+                0.00    0.00  170251/207737      cpu_write [30]
+                0.00    0.00  146697/146697      op_ror [31]
+                0.00    0.00   46896/46896       addr_imm [32]
+                0.00    0.00   43276/43276       addr_impl [33]
+                0.00    0.00   27741/27741       op_beq [34]
+                0.00    0.00   23297/23297       op_sta [35]
+                0.00    0.00   18497/18497       op_jsr [36]
+                0.00    0.00   18496/18496       op_rts [37]
+                0.00    0.00   18438/18438       op_clc [38]
+                0.00    0.00   18372/18372       op_jmp [39]
+                0.00    0.00    4306/4306        op_bne [41]
+                0.00    0.00    3392/3392        op_dey [42]
+                0.00    0.00    1620/1620        ppu_cpu_write [43]
+                0.00    0.00    1286/1286        op_iny [44]
+                0.00    0.00    1125/1125        addr_acc [45]
+                0.00    0.00     850/850         op_lsr [46]
+                0.00    0.00     689/689         op_dex [47]
+                0.00    0.00     382/382         op_bcs [48]
+                0.00    0.00     336/336         op_pla [50]
+                0.00    0.00     336/336         op_pha [49]
+                0.00    0.00     311/311         op_bpl [51]
+                0.00    0.00     265/265         op_rol [52]
+                0.00    0.00     154/154         op_bcc [53]
+                0.00    0.00     145/145         op_asl [54]
+                0.00    0.00     104/104         op_tya [55]
+                0.00    0.00      87/87          op_dec [56]
+                0.00    0.00      83/83          op_stx [57]
+                0.00    0.00      60/60          op_tax [58]
+                0.00    0.00      55/55          op_sec [59]
+                0.00    0.00      52/52          op_cmp [60]
+                0.00    0.00      39/39          op_sty [61]
+                0.00    0.00      26/26          op_tay [62]
+                0.00    0.00      21/21          op_inc [63]
+                0.00    0.00      17/17          op_cld [64]
+                0.00    0.00      16/16          op_rti [67]
+                0.00    0.00      16/16          op_inx [66]
+                0.00    0.00       7/7           op_txa [70]
+                0.00    0.00       2/2           op_bmi [71]
+                0.00    0.00       1/1           op_txs [78]
+                0.00    0.00       1/1           op_sei [77]
+-----------------------------------------------
+                0.00    0.00       1/800033      op_adc [24]
+                0.00    0.00       2/800033      reset [23]
+                0.00    0.00      32/800033      addr_aby [22]
+                0.00    0.00      32/800033      check_interrupts [21]
+                0.00    0.00      33/800033      op_eor [20]
+                0.00    0.00      58/800033      op_ldx [19]
+                0.00    0.00      80/800033      op_sbc [18]
+                0.00    0.00      89/800033      op_ora [17]
+                0.00    0.00     115/800033      op_ldy [16]
+                0.00    0.00     336/800033      addr_zpx [15]
+                0.00    0.00     524/800033      addr_abx [14]
+                0.00    0.00     959/800033      op_lda [13]
+                0.00    0.00    3001/800033      addr_indy [12]
+                0.00    0.00   32896/800033      addr_rel [11]
+                0.00    0.00   45954/800033      op_and [10]
+                0.00    0.00   96098/800033      addr_abs [9]
+                0.00    0.00  221983/800033      addr_zp [8]
+                0.00    0.00  397840/800033      cpu_run [6]
+[7]     25.0    0.01    0.00  800033         cartridge_cpu_read [7]
+                0.00    0.00  800033/800033      mapper0_cpu_map_read [29]
+-----------------------------------------------
+                0.00    0.00  221983/221983      cpu_run [6]
+[8]      6.9    0.00    0.00  221983         addr_zp [8]
+                0.00    0.00  221983/800033      cartridge_cpu_read [7]
+                0.00    0.00  221983/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00   48049/48049       cpu_run [6]
+[9]      3.0    0.00    0.00   48049         addr_abs [9]
+                0.00    0.00   96098/800033      cartridge_cpu_read [7]
+                0.00    0.00   96098/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00   45986/45986       cpu_run [6]
+[10]     1.4    0.00    0.00   45986         op_and [10]
+                0.00    0.00   45954/800033      cartridge_cpu_read [7]
+                0.00    0.00   45986/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00   32896/32896       cpu_run [6]
+[11]     1.0    0.00    0.00   32896         addr_rel [11]
+                0.00    0.00   32896/800033      cartridge_cpu_read [7]
+                0.00    0.00   32896/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00    3001/3001        cpu_run [6]
+[12]     0.1    0.00    0.00    3001         addr_indy [12]
+                0.00    0.00    3001/800033      cartridge_cpu_read [7]
+                0.00    0.00    9003/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00   47907/47907       cpu_run [6]
+[13]     0.0    0.00    0.00   47907         op_lda [13]
+                0.00    0.00     959/800033      cartridge_cpu_read [7]
+                0.00    0.00   47907/909493      cpu_read [28]
+                0.00    0.00    9131/9203        ppu_cpu_read [40]
+-----------------------------------------------
+                0.00    0.00     262/262         cpu_run [6]
+[14]     0.0    0.00    0.00     262         addr_abx [14]
+                0.00    0.00     524/800033      cartridge_cpu_read [7]
+                0.00    0.00     524/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00     336/336         cpu_run [6]
+[15]     0.0    0.00    0.00     336         addr_zpx [15]
+                0.00    0.00     336/800033      cartridge_cpu_read [7]
+                0.00    0.00     336/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00     233/233         cpu_run [6]
+[16]     0.0    0.00    0.00     233         op_ldy [16]
+                0.00    0.00     115/800033      cartridge_cpu_read [7]
+                0.00    0.00     233/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00     345/345         cpu_run [6]
+[17]     0.0    0.00    0.00     345         op_ora [17]
+                0.00    0.00      89/800033      cartridge_cpu_read [7]
+                0.00    0.00     345/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00      96/96          cpu_run [6]
+[18]     0.0    0.00    0.00      96         op_sbc [18]
+                0.00    0.00      80/800033      cartridge_cpu_read [7]
+                0.00    0.00      96/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00     211/211         cpu_run [6]
+[19]     0.0    0.00    0.00     211         op_ldx [19]
+                0.00    0.00      58/800033      cartridge_cpu_read [7]
+                0.00    0.00     211/909493      cpu_read [28]
+                0.00    0.00      72/9203        ppu_cpu_read [40]
+-----------------------------------------------
+                0.00    0.00   18370/18370       cpu_run [6]
+[20]     0.0    0.00    0.00   18370         op_eor [20]
+                0.00    0.00      33/800033      cartridge_cpu_read [7]
+                0.00    0.00   18370/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00  397856/397856      cpu_clock [5]
+[21]     0.0    0.00    0.00  397856         check_interrupts [21]
+                0.00    0.00      32/800033      cartridge_cpu_read [7]
+                0.00    0.00      32/909493      cpu_read [28]
+                0.00    0.00      16/16          push_stack16 [69]
+                0.00    0.00      16/16          push_stack [68]
+-----------------------------------------------
+                0.00    0.00      16/16          cpu_run [6]
+[22]     0.0    0.00    0.00      16         addr_aby [22]
+                0.00    0.00      32/800033      cartridge_cpu_read [7]
+                0.00    0.00      32/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[23]     0.0    0.00    0.00       1         reset [23]
+                0.00    0.00       2/800033      cartridge_cpu_read [7]
+                0.00    0.00       2/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00     115/115         cpu_run [6]
+[24]     0.0    0.00    0.00     115         op_adc [24]
+                0.00    0.00       1/800033      cartridge_cpu_read [7]
+                0.00    0.00     115/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00 1546679/1546679     main [1]
+[25]     0.0    0.00    0.00 1546679         sdl_poll_quit [25]
+-----------------------------------------------
+                0.00    0.00 1546678/1546678     bus_clock [4]
+[26]     0.0    0.00    0.00 1546678         ppu_clock [26]
+-----------------------------------------------
+                0.00    0.00 1546678/1546678     bus_clock [4]
+[27]     0.0    0.00    0.00 1546678         ppu_nmi_triggered [27]
+-----------------------------------------------
+                0.00    0.00       2/909493      reset [23]
+                0.00    0.00      21/909493      op_inc [63]
+                0.00    0.00      32/909493      addr_aby [22]
+                0.00    0.00      32/909493      check_interrupts [21]
+                0.00    0.00      48/909493      op_rti [67]
+                0.00    0.00      87/909493      op_dec [56]
+                0.00    0.00      96/909493      op_sbc [18]
+                0.00    0.00     115/909493      op_adc [24]
+                0.00    0.00     211/909493      op_ldx [19]
+                0.00    0.00     233/909493      op_ldy [16]
+                0.00    0.00     336/909493      addr_zpx [15]
+                0.00    0.00     336/909493      op_pla [50]
+                0.00    0.00     345/909493      op_ora [17]
+                0.00    0.00     524/909493      addr_abx [14]
+                0.00    0.00    9003/909493      addr_indy [12]
+                0.00    0.00   18370/909493      op_eor [20]
+                0.00    0.00   32896/909493      addr_rel [11]
+                0.00    0.00   36992/909493      op_rts [37]
+                0.00    0.00   45986/909493      op_and [10]
+                0.00    0.00   47907/909493      op_lda [13]
+                0.00    0.00   96098/909493      addr_abs [9]
+                0.00    0.00  221983/909493      addr_zp [8]
+                0.00    0.00  397840/909493      cpu_run [6]
+[28]     0.0    0.00    0.00  909493         cpu_read [28]
+-----------------------------------------------
+                0.00    0.00  800033/800033      cartridge_cpu_read [7]
+[29]     0.0    0.00    0.00  800033         mapper0_cpu_map_read [29]
+-----------------------------------------------
+                0.00    0.00      16/207737      push_stack [68]
+                0.00    0.00      21/207737      op_inc [63]
+                0.00    0.00      32/207737      push_stack16 [69]
+                0.00    0.00      87/207737      op_dec [56]
+                0.00    0.00     336/207737      op_pha [49]
+                0.00    0.00   36994/207737      op_jsr [36]
+                0.00    0.00  170251/207737      cpu_run [6]
+[30]     0.0    0.00    0.00  207737         cpu_write [30]
+-----------------------------------------------
+                0.00    0.00  146697/146697      cpu_run [6]
+[31]     0.0    0.00    0.00  146697         op_ror [31]
+-----------------------------------------------
+                0.00    0.00   46896/46896       cpu_run [6]
+[32]     0.0    0.00    0.00   46896         addr_imm [32]
+-----------------------------------------------
+                0.00    0.00   43276/43276       cpu_run [6]
+[33]     0.0    0.00    0.00   43276         addr_impl [33]
+-----------------------------------------------
+                0.00    0.00   27741/27741       cpu_run [6]
+[34]     0.0    0.00    0.00   27741         op_beq [34]
+-----------------------------------------------
+                0.00    0.00   23297/23297       cpu_run [6]
+[35]     0.0    0.00    0.00   23297         op_sta [35]
+-----------------------------------------------
+                0.00    0.00   18497/18497       cpu_run [6]
+[36]     0.0    0.00    0.00   18497         op_jsr [36]
+                0.00    0.00   36994/207737      cpu_write [30]
+-----------------------------------------------
+                0.00    0.00   18496/18496       cpu_run [6]
+[37]     0.0    0.00    0.00   18496         op_rts [37]
+                0.00    0.00   36992/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00   18438/18438       cpu_run [6]
+[38]     0.0    0.00    0.00   18438         op_clc [38]
+-----------------------------------------------
+                0.00    0.00   18372/18372       cpu_run [6]
+[39]     0.0    0.00    0.00   18372         op_jmp [39]
+-----------------------------------------------
+                0.00    0.00      72/9203        op_ldx [19]
+                0.00    0.00    9131/9203        op_lda [13]
+[40]     0.0    0.00    0.00    9203         ppu_cpu_read [40]
+-----------------------------------------------
+                0.00    0.00    4306/4306        cpu_run [6]
+[41]     0.0    0.00    0.00    4306         op_bne [41]
+-----------------------------------------------
+                0.00    0.00    3392/3392        cpu_run [6]
+[42]     0.0    0.00    0.00    3392         op_dey [42]
+-----------------------------------------------
+                0.00    0.00    1620/1620        cpu_run [6]
+[43]     0.0    0.00    0.00    1620         ppu_cpu_write [43]
+-----------------------------------------------
+                0.00    0.00    1286/1286        cpu_run [6]
+[44]     0.0    0.00    0.00    1286         op_iny [44]
+-----------------------------------------------
+                0.00    0.00    1125/1125        cpu_run [6]
+[45]     0.0    0.00    0.00    1125         addr_acc [45]
+-----------------------------------------------
+                0.00    0.00     850/850         cpu_run [6]
+[46]     0.0    0.00    0.00     850         op_lsr [46]
+-----------------------------------------------
+                0.00    0.00     689/689         cpu_run [6]
+[47]     0.0    0.00    0.00     689         op_dex [47]
+-----------------------------------------------
+                0.00    0.00     382/382         cpu_run [6]
+[48]     0.0    0.00    0.00     382         op_bcs [48]
+-----------------------------------------------
+                0.00    0.00     336/336         cpu_run [6]
+[49]     0.0    0.00    0.00     336         op_pha [49]
+                0.00    0.00     336/207737      cpu_write [30]
+-----------------------------------------------
+                0.00    0.00     336/336         cpu_run [6]
+[50]     0.0    0.00    0.00     336         op_pla [50]
+                0.00    0.00     336/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00     311/311         cpu_run [6]
+[51]     0.0    0.00    0.00     311         op_bpl [51]
+-----------------------------------------------
+                0.00    0.00     265/265         cpu_run [6]
+[52]     0.0    0.00    0.00     265         op_rol [52]
+-----------------------------------------------
+                0.00    0.00     154/154         cpu_run [6]
+[53]     0.0    0.00    0.00     154         op_bcc [53]
+-----------------------------------------------
+                0.00    0.00     145/145         cpu_run [6]
+[54]     0.0    0.00    0.00     145         op_asl [54]
+-----------------------------------------------
+                0.00    0.00     104/104         cpu_run [6]
+[55]     0.0    0.00    0.00     104         op_tya [55]
+-----------------------------------------------
+                0.00    0.00      87/87          cpu_run [6]
+[56]     0.0    0.00    0.00      87         op_dec [56]
+                0.00    0.00      87/909493      cpu_read [28]
+                0.00    0.00      87/207737      cpu_write [30]
+-----------------------------------------------
+                0.00    0.00      83/83          cpu_run [6]
+[57]     0.0    0.00    0.00      83         op_stx [57]
+-----------------------------------------------
+                0.00    0.00      60/60          cpu_run [6]
+[58]     0.0    0.00    0.00      60         op_tax [58]
+-----------------------------------------------
+                0.00    0.00      55/55          cpu_run [6]
+[59]     0.0    0.00    0.00      55         op_sec [59]
+-----------------------------------------------
+                0.00    0.00      52/52          cpu_run [6]
+[60]     0.0    0.00    0.00      52         op_cmp [60]
+-----------------------------------------------
+                0.00    0.00      39/39          cpu_run [6]
+[61]     0.0    0.00    0.00      39         op_sty [61]
+-----------------------------------------------
+                0.00    0.00      26/26          cpu_run [6]
+[62]     0.0    0.00    0.00      26         op_tay [62]
+-----------------------------------------------
+                0.00    0.00      21/21          cpu_run [6]
+[63]     0.0    0.00    0.00      21         op_inc [63]
+                0.00    0.00      21/909493      cpu_read [28]
+                0.00    0.00      21/207737      cpu_write [30]
+-----------------------------------------------
+                0.00    0.00      17/17          cpu_run [6]
+[64]     0.0    0.00    0.00      17         op_cld [64]
+-----------------------------------------------
+                0.00    0.00      16/16          bus_clock [4]
+[65]     0.0    0.00    0.00      16         cpu_set_nmi [65]
+-----------------------------------------------
+                0.00    0.00      16/16          cpu_run [6]
+[66]     0.0    0.00    0.00      16         op_inx [66]
+-----------------------------------------------
+                0.00    0.00      16/16          cpu_run [6]
+[67]     0.0    0.00    0.00      16         op_rti [67]
+                0.00    0.00      48/909493      cpu_read [28]
+-----------------------------------------------
+                0.00    0.00      16/16          check_interrupts [21]
+[68]     0.0    0.00    0.00      16         push_stack [68]
+                0.00    0.00      16/207737      cpu_write [30]
+-----------------------------------------------
+                0.00    0.00      16/16          check_interrupts [21]
+[69]     0.0    0.00    0.00      16         push_stack16 [69]
+                0.00    0.00      32/207737      cpu_write [30]
+-----------------------------------------------
+                0.00    0.00       7/7           cpu_run [6]
+[70]     0.0    0.00    0.00       7         op_txa [70]
+-----------------------------------------------
+                0.00    0.00       2/2           cpu_run [6]
+[71]     0.0    0.00    0.00       2         op_bmi [71]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[72]     0.0    0.00    0.00       1         cartridge_load [72]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[73]     0.0    0.00    0.00       1         cpu_init [73]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[74]     0.0    0.00    0.00       1         debug_log_close [74]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[75]     0.0    0.00    0.00       1         debug_log_init [75]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[76]     0.0    0.00    0.00       1         init_op_table [76]
+-----------------------------------------------
+                0.00    0.00       1/1           cpu_run [6]
+[77]     0.0    0.00    0.00       1         op_sei [77]
+-----------------------------------------------
+                0.00    0.00       1/1           cpu_run [6]
+[78]     0.0    0.00    0.00       1         op_txs [78]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[79]     0.0    0.00    0.00       1         ppu_init [79]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[80]     0.0    0.00    0.00       1         sdl_init [80]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[81]     0.0    0.00    0.00       1         sdl_shutdown [81]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+   [9] addr_abs               [53] op_bcc                 [67] op_rti
+  [14] addr_abx               [48] op_bcs                 [37] op_rts
+  [22] addr_aby               [34] op_beq                 [18] op_sbc
+  [45] addr_acc               [71] op_bmi                 [59] op_sec
+  [32] addr_imm               [41] op_bne                 [77] op_sei
+  [33] addr_impl              [51] op_bpl                 [35] op_sta
+  [12] addr_indy              [38] op_clc                 [57] op_stx
+  [11] addr_rel               [64] op_cld                 [61] op_sty
+   [8] addr_zp                [60] op_cmp                 [58] op_tax
+  [15] addr_zpx               [56] op_dec                 [62] op_tay
+   [4] bus_clock              [47] op_dex                 [70] op_txa
+   [7] cartridge_cpu_read     [42] op_dey                 [78] op_txs
+  [72] cartridge_load         [20] op_eor                 [55] op_tya
+  [21] check_interrupts       [63] op_inc                 [26] ppu_clock
+   [5] cpu_clock              [66] op_inx                 [40] ppu_cpu_read
+  [73] cpu_init               [44] op_iny                 [43] ppu_cpu_write
+  [28] cpu_read               [39] op_jmp                  [2] ppu_frame_buffer
+   [6] cpu_run                [36] op_jsr                 [79] ppu_init
+  [65] cpu_set_nmi            [13] op_lda                 [27] ppu_nmi_triggered
+  [30] cpu_write              [19] op_ldx                 [68] push_stack
+  [74] debug_log_close        [16] op_ldy                 [69] push_stack16
+  [75] debug_log_init         [46] op_lsr                 [23] reset
+  [76] init_op_table          [17] op_ora                 [80] sdl_init
+  [29] mapper0_cpu_map_read   [49] op_pha                 [25] sdl_poll_quit
+  [24] op_adc                 [50] op_pla                  [3] sdl_render_frame
+  [10] op_and                 [52] op_rol                 [81] sdl_shutdown
+  [54] op_asl                 [31] op_ror
